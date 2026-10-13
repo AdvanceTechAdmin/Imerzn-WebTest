@@ -28,7 +28,7 @@ test('Create Experience', async ({ page }) => {
   const findTouristGuidePage = new FindTouristGuidePage(page);
 
   // Steps 1: Sign in to the test account.
-  await step('Sign in to the test account', async () => {
+  await step('[STEP] Sign in to the test account', async () => {
     await loginPage.open();
     await closeNewsletterPopupIfVisible(page);
 
@@ -44,7 +44,7 @@ test('Create Experience', async ({ page }) => {
   const profileUrl = page.url();
 
   // Steps 2: Open the Create Experience page and fill in the form.
-  await step('Fill in the Create Experience form', async () => {
+  await step('[STEP] Fill in the Create Experience form', async () => {
     await closeNewsletterPopupIfVisible(page);
 
     await profilePage.createExperienceLink.click();
@@ -60,20 +60,20 @@ test('Create Experience', async ({ page }) => {
   });
 
   // Steps 3: Publish the experience and verify the API response.
-  await step('Publish the experience', async () => {
+  await step('[STEP] Publish the experience', async () => {
     await closeNewsletterPopupIfVisible(page);
     await createExperiencePage.publishAndVerify();
   });
 
   // Steps 4: Verify the published experience appears on the profile.
-  await step('Verify the published experience', async () => {
+  await step('[STEP] Verify the published experience in localite profile', async () => {
     await closeNewsletterPopupIfVisible(page);
     await profilePage.verifyPublishedExperience(profileUrl, data.title);
     await closeNewsletterPopupIfVisible(page);
   });
 
    // Steps 5: Search for the created experience and verify the result.
-  await step('Search for the created experience', async () => {
+  await step('[STEP] Search for the created experience', async () => {
 
     await findTouristGuidePage.openExperiences();
 

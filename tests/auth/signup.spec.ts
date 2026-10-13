@@ -5,7 +5,7 @@ import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
 import { createSignupFormData, readAuthData } from '../../utils/auth-data';
 import { closeNewsletterPopupIfVisible } from '../../utils/common';
 
-test('traveler can submit signup successfully', async ({ page }) => {
+test('AUTH-003 | Traveler can complete the signup process', async ({ page }) => {
   // Run only when explicitly enabled because signup may trigger real SMS verification.
   test.skip(
     process.env.RUN_SIGNUP_TEST !== 'true',

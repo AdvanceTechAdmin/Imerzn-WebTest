@@ -5,7 +5,7 @@ import { readAuthData } from '../../utils/auth-data';
 
 // Test 1: Verify that an unregistered email cannot log in.
 
-test('Login - unregistered email displays an error', async ({ page }) => {
+test('AUTH-001 | Login fails with an unregistered email', async ({ page }) => {
   // Preparation: Read the test account credentials from the CSV file.
   const { loginEmail, loginPassword } = await readAuthData();
 
@@ -31,7 +31,7 @@ test('Login - unregistered email displays an error', async ({ page }) => {
 });
 
 // Test 2: Verify that a registered user can log in successfully.
-test('Login - valid user can access Dashboard', async ({ page }) => {
+test('AUTH-002 | Registered user can access the Dashboard', async ({ page }) => {
   // Read the registered user's credentials from the CSV file.
   const { loginEmail, loginPassword } = await readAuthData();
 
