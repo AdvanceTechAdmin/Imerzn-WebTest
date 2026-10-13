@@ -1,0 +1,41 @@
+```gitignore
+# Dependencies
+node_modules/
+
+# Playwright reports and test artifacts
+playwright-report/
+test-results/
+playwright/.cache/
+blob-report/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Local authentication data
+testdata/auth.csv
+
+# Logs
+*.log
+npm-debug.log*
+
+# Coverage reports
+coverage/
+
+# Build output
+dist/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local editor settings (optional)
+.vscode/*
+!.vscode/extensions.json
+
+# Local AI/MCP cache (only if generated locally)
+.playwright-mcp/
+```

@@ -1,0 +1,249 @@
+Create a robust Playwright test automation framework using the following natural language requirements
+
+## Setup Requirements
+
+
+Please set up a complete test environment with:
+
+1. Node.js and npm for running JavaScript/TypeScript
+
+2. Playwright for browser automation
+* Install Playwright
+* Install browser engines (Chromium)
+* Set up Playwright Test Runner
+
+3. TypeScript for better code reliability
+
+4. VS Code extensions for:
+* Playwright Test Explorer
+* Test Running and Debugging
+* Code Intelligence
+
+5. Reporting tools for:
+* HTML test reports
+* Screenshot and video capture
+* Test execution logs
+
+6. Install Playwright Test Agent
+
+## Framework Overview
+
+Please build a professional, maintainable Playwright test automation framework with the following project structure:
+
+```text
+project-root/
+├── tests/
+├── specs/          # All .spec.ts test cases
+├── pages/          # Page Object Model classes
+├── utils/          # Reusable helper functions
+├── fixtures/       # Shared/custom Playwright fixtures
+├── testdata/       # JSON, CSV, and other test data
+│
+├── playwright.config.ts
+├── tsconfig.json
+├── package.json
+└── README.md
+```
+
+**Important:**
+
+* All folders above must be created at the **same project-root level**.
+* Use Page Object Model with `pages/`.
+* Keep reusable helpers in `utils/`.
+* Keep shared Playwright fixtures in `fixtures/`.
+* Keep test data in `testdata/`.
+* Do not put the entire test implementation into a single `.spec.ts` file.
+* Keep `tests/` available for other general test-related files if needed.
+
+The framework should also:
+
+1. Handle test failures gracefully with screenshots and logs.
+2. Use reliable Playwright locator strategies.
+3. Support Chromium
+4. Support parallel test execution.
+5. Be easy to maintain and update.
+6. Provide clear error messages when tests fail.
+7. Use Playwright best practices and TypeScript.
+
+
+## Test Writing Format
+
+
+When writing tests, I will provide:
+1. The website URL I want to test
+2. The steps to perform in plain English
+3. Any login details needed
+4. What I want to check on each page
+5. Which browsers to test in
+
+## Framework Features I Need
+
+Please include:
+
+1. Smart ways to find elements even if the page changes
+2. Clear logging so I can see what the test is doing
+3. Screenshots if something goes wrong
+4. Easy way to manage test data
+5. Support for running tests in parallel
+
+## Example Test Request
+
+Create a test that:
+1. Goes to https://dev.imerzn.com
+2. Click on Signup button
+3. Select traveler
+4. Input all required infomation for signup
+5. Check on checkbox for "By signing up, you consent to receiving SMS text messages from Imerzn™ and agree to our Terms of Service and Privacy Notice"
+6. Click on Sign Up
+7. Verify "Verify number" dialog is displayed
+
+
+Make sure the test:
+* Can handle slow loading pages
+* Takes screenshots if it fails
+* Works in Chrome and Firefox
+* Has clear error messages
+* Logs each step it performs
+
+## What to Include in Test Steps
+
+For each test step, please tell me:
+
+1. What page we should be on
+2. What to click or type
+3. What should appear on the page
+4. How long to wait if needed
+5. What could go wrong
+
+
+## How to handle problems
+
+1. Take a screenshot
+2. Write a clear error message
+3. Try a different way to find elements
+4. Wait for slow pages
+5. Tell me exactly where it failed
+
+## Example Format for Writing Test Steps
+
+When writing my test steps, I will use this format:
+
+1. Starting point
+* What website we're on
+* Are we logged in or not
+
+2. Each action step
+* What to click or type
+* What should happen next
+* How long to wait if needed
+
+3. Checking things
+* What should be on the page
+* Any specific text or elements
+* Any error messages to watch for
+
+4. Finishing up
+* How to clean up (logout, etc.)
+* What final state to verify
+
+
+
+## How to Describe Page Elements
+
+When I need to interact with something on the page, I'll describe it in multiple ways:
+
+1. By its visible text
+
+* The exact text shown on the button/link
+* Any nearby text that helps identify it
+* The label or placeholder text
+
+2. By its purpose
+
+* What the element does (submit form, search, etc.)
+* What kind of element it is (button, textbox, dropdown)
+* Where you would expect to find it on the page
+
+3. By its appearance
+
+* What it looks like (color, size, icon)
+* Where it appears on the page (top, bottom, near other elements)
+* Any special styling or state (disabled, highlighted)
+
+4. By its context
+
+* What section of the page it's in
+* What comes before or after it
+* What it's related to
+
+This helps the test find elements reliably even if the page changes slightly. If one way of finding
+
+
+## Special Cases to Consider
+
+1. Login and Security
+
+* How to log in and out
+* What to do if login fails
+* How to handle timeouts
+* What to do if pages load slowly
+
+2. Forms and Inputs
+
+* How to fill in forms
+* What to do with dropdowns
+* How to handle date pickers
+* What to do if saving fails
+
+3. Messages and Popups
+
+* What success messages to expect
+* How to handle error messages
+* What to do with confirmation popups
+* How to deal with unexpected alerts
+
+## What Good Test Results Look Like
+
+Your test should:
+1. Run without errors most of the time
+2. Tell you exactly what went wrong if it fails
+3. Work the same way in different browsers
+4. Be easy to update if the website changes
+5. Handle slow internet connections
+6. Take screenshots of errors
+7. Give clear pass/fail results
+
+## How to write your Test Request
+
+When asking for a new test, tell me:
+
+1. The website you want to test
+2. What you want to accomplish
+3. Any special conditions to check
+4. What success looks like
+5. What problems to watch out for
+
+This will help create reliable, easy-to-maintain tests that catch real problems.
+
+## Project Configuration Needs
+
+Tell me about:
+1. Package dependencies needed:
+* Which test runner to use
+* Any additional npm packages required
+* Specific versions if needed
+
+2. Configuration files:
+* playwright.config.ts settings
+* tsconfig.json for TypeScript
+* Any environment variables
+
+3. Project structure:
+* Where test files should go
+* Where to put test data
+* Where to save reports
+
+4. Additional tooling:
+* Code formatting tools
+* Linting requirements
+* CI/CD integration needs

@@ -1,0 +1,23 @@
+{
+  "name": "imerzn-playwright-framework",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TypeScript Playwright end-to-end test framework",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:signup": "playwright test tests/auth/signup.spec.ts",
+    "test:create-experience": "playwright test tests/localite/create-experience.spec.ts",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit",
+    "install:browsers": "playwright install chromium firefox webkit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^22.15.0",
+    "dotenv": "^16.4.7",
+    "typescript": "^5.8.3"
+  }
+}

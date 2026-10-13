@@ -1,0 +1,27 @@
+# Enter or edit the Value column. Keep the Field names as written.
+# For multiple categories, start times, or included items, separate values with |.
+# Primary image and additional media paths are relative to the project root.
+Field,Value
+Experience Type,Normal Experience
+Title,Automation
+Category,Culture & Heritage
+Location,New York
+Price,45
+Know Before,Comfortable walking shoes are recommended. Please arrive 10 minutes before the scheduled start time.
+Transport Type,No
+Accessibility,No
+Min People,1
+Max People,10
+Multi Day,No
+Duration,2
+Same Time All Days,Yes
+Starting Times,9:00 AM|1:30 PM
+Meeting Point,"New York, NY, USA"
+Drop-off Point,"New York, NY, USA"
+Status,Active
+Meeting/Drop-off Notes,Please meet your guide at the Boston Common Visitor Center 10 minutes before the start time.
+Included,Professional local guide|Walking tour
+Description,"Explore Boston's historic Freedom Trail with a local guide. Discover important landmarks, hear fascinating stories about Boston's history, and enjoy a relaxed walking experience through the heart of the city."
+Policy,Free cancellation up to 24 hours before the experience. Cancellations made less than 24 hours before the start time are non-refundable.
+Primary Image,testdata/primary-image.png
+Additional Media,
