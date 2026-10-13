@@ -44,7 +44,7 @@ jobs:
         env:
           BASE_URL: https://dev.imerzn.com
           IMERZN_PASSWORD: ${{ secrets.IMERZN_PASSWORD }}
-          RUN_SIGNUP_TEST: 'false'
+          RUN_SIGNUP_TEST: 'true'
         run: npm test
 
       - name: Upload Playwright report
