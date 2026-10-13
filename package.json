@@ -9,7 +9,7 @@
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
     "test:signup": "playwright test tests/auth/signup.spec.ts",
-    "test:create-experience": "playwright test tests/localite/create-experience.spec.ts",
+"test:create-experience": "playwright test tests/localite/create-a-publish-experience.spec.ts",
     "report": "playwright show-report",
     "typecheck": "tsc --noEmit",
     "install:browsers": "playwright install chromium firefox webkit"
