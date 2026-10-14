@@ -35,6 +35,8 @@ jobs:
             echo "Missing AUTH_CSV_BASE64 GitHub secret"
             exit 1
           fi
+          # testdata/common only holds the git-ignored auth.csv, so the folder is not in the repo.
+          mkdir -p testdata/common
           printf '%s' "$AUTH_CSV_BASE64" | base64 --decode > testdata/common/auth.csv
 
       - name: Type check
