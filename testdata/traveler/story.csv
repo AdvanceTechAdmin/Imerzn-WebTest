@@ -1,0 +1,11 @@
+# Traveler story test data. Keep the Field names as written.
+# Title Prefix and Updated Title Prefix get the same " + 6 random digits" at runtime,
+# e.g. "My Story 123456" -> "My Updated Story 123456".
+# Description must be at least 10 characters. Image path is relative to the project root.
+Field,Value
+Title Prefix,My Story
+Location,"New York, NY, USA"
+Description,"A sunny walk through Central Park, bagels on the Lower East Side, and sunset views from the Brooklyn Bridge."
+Image,testdata/traveler/story-image.png
+Updated Title Prefix,My Updated Story
+Updated Description,"Updated: an early morning ferry to the Statue of Liberty, pizza in Brooklyn, and a jazz night in Harlem."

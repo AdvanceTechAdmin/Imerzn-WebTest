@@ -1,0 +1,4 @@
+# Wishlist test data. Keep the Field names as written.
+# Name Prefix gets " + 6 random digits" added at runtime, e.g. "Wishlist 123456".
+Field,Value
+Name Prefix,Wishlist

@@ -1,0 +1,9 @@
+# Enter or edit the Value column. Keep the Field names as written.
+# Title Prefix gets " + 6 random digits" added at runtime, e.g. "Gallery 123456".
+# Image paths are relative to the project root. Separate multiple Additional Media files with |.
+Field,Value
+Title Prefix,Gallery
+Location,"New York, NY, USA"
+Description,"A visual journey through New York City: street food, skyline views, and hidden neighborhood corners captured on a local walking tour."
+Primary Image,testdata/localite/gallery.png
+Additional Media,

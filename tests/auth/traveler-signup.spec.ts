@@ -4,6 +4,7 @@ import { SignupPage } from '../../pages/auth/signup-page';
 import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
 import { createSignupFormData, readAuthData } from '../../utils/auth-data';
 import { closeNewsletterPopupIfVisible } from '../../utils/common';
+import { saveCreatedTraveler } from '../../utils/created-localite';
 
 test('AUTH-003 | Traveler can complete the signup process', async ({ page }) => {
   // Run only when explicitly enabled because signup may trigger real SMS verification.
@@ -13,7 +14,8 @@ test('AUTH-003 | Traveler can complete the signup process', async ({ page }) => 
   );
 
   // Prepare signup test data from the CSV file.
-  const signupData = createSignupFormData(await readAuthData());
+  const authData = await readAuthData();
+  const signupData = createSignupFormData(authData);
   const signupPage = new SignupPage(page);
 
   // Step 1: Open the signup page and select Traveler.
@@ -26,9 +28,9 @@ test('AUTH-003 | Traveler can complete the signup process', async ({ page }) => 
   // Step 3: Submit the signup form.
   await signupPage.submit();
 
-  // Step 4: Enter OTP .
+  // Step 4: Enter the test OTP from auth.csv.
   await test.step('Verify OTP number', async () => {
-    await signupPage.verifyOTPNumber('000000');
+    await signupPage.verifyOTPNumber(authData.signupOtp);
   });
 
 
@@ -36,7 +38,7 @@ test('AUTH-003 | Traveler can complete the signup process', async ({ page }) => 
   await test.step('Upload and save profile picture', async () => {
     const profilePicturePath = resolve(
       process.cwd(),
-      'testdata/profile-picture.jpg',
+      'testdata/traveler/profile-picture.jpg',
     );
     await signupPage.uploadProfilePicture(profilePicturePath);
     // Save the image in the Crop Profile Picture dialog.
@@ -57,5 +59,13 @@ test('AUTH-003 | Traveler can complete the signup process', async ({ page }) => 
     await expect(guideProfilePage.dashboardLink).toBeVisible({
       timeout: 30_000,
     });
+  });
+
+  // Save the account so traveler tests (e.g. Wishlist) can log in with it.
+  await saveCreatedTraveler({
+    email: signupData.email,
+    password: signupData.password,
+    firstName: signupData.firstName,
+    lastName: signupData.lastName,
   });
 });

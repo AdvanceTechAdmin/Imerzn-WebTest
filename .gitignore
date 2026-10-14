@@ -1,4 +1,3 @@
-```gitignore
 # Dependencies
 node_modules/
 
@@ -14,7 +13,10 @@ blob-report/
 !.env.example
 
 # Local authentication data
-testdata/auth.csv
+testdata/common/auth.csv
+testdata/localite/created-localite.json
+testdata/localite/created-content.json
+testdata/traveler/created-traveler.json
 
 # Logs
 *.log
@@ -38,4 +40,3 @@ Desktop.ini
 
 # Local AI/MCP cache (only if generated locally)
 .playwright-mcp/
-```

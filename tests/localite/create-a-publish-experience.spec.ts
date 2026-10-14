@@ -4,9 +4,9 @@ import { CreateExperiencePage } from '../../pages/localite/create-experience-pag
 import { FindTouristGuidePage } from '../../pages/localite/find-tourist-guide-page';
 import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
 import { LoginPage } from '../../pages/auth/login-page';
+import { getLocaliteAccount, saveCreatedContent } from '../../utils/created-localite';
 import { readExperienceData } from '../../utils/experience-data';
-import { step } from '../../utils/steps';
-import { closeNewsletterPopupIfVisible } from '../../utils/common';
+import { closeNewsletterPopupIfVisible, step } from '../../utils/common';
 
 test('Create Experience', async ({ page }) => {
   // Pre-setup: Prepare test data and page objects.
@@ -17,10 +17,9 @@ test('Create Experience', async ({ page }) => {
     title: `Automation Experience - ${randomInt(10_000, 100_000)}`,
   };
 
-  const password = process.env.IMERZN_PASSWORD;
-  if (!password) {
-    throw new Error('Set IMERZN_PASSWORD before running this test.');
-  }
+  // Use the localite created by LOC-001; fall back to the Login account in auth.csv.
+  const localite = await getLocaliteAccount();
+  test.info().annotations.push({ type: 'Localite email', description: localite.email });
 
   const loginPage = new LoginPage(page);
   const profilePage = new GuideProfilePage(page);
@@ -32,7 +31,7 @@ test('Create Experience', async ({ page }) => {
     await loginPage.open();
     await closeNewsletterPopupIfVisible(page);
 
-    await loginPage.login('phuonglocalite@yopmail.com', password);
+    await loginPage.login(localite.email, localite.password);
     await closeNewsletterPopupIfVisible(page);
 
     await expect(page).toHaveURL(/guide_detailed_page/, {
@@ -71,6 +70,9 @@ test('Create Experience', async ({ page }) => {
     await profilePage.verifyPublishedExperience(profileUrl, data.title);
     await closeNewsletterPopupIfVisible(page);
   });
+
+  // Record the title so Preview Profile can verify it.
+  await saveCreatedContent(localite.email, { experienceTitle: data.title });
 
    // Steps 5: Search for the created experience and verify the result.
   await step('Search for the created experience', async () => {

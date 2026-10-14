@@ -1,9 +1,15 @@
 
 import { expect, type Locator, type Page } from '@playwright/test';
+import { ProfileSharingDialog } from '../components/profile-sharing-dialog';
 
 /** Page Object for links and experience entries on a guide's profile page. */
 export class GuideProfilePage {
-  constructor(private readonly page: Page) {}
+  /** Profile Sharing dialog opened by Share Profile. */
+  readonly shareDialog: ProfileSharingDialog;
+
+  constructor(private readonly page: Page) {
+    this.shareDialog = new ProfileSharingDialog(page);
+  }
 
   /** Navigation link shown after a guide signs in. */
   get dashboardLink(): Locator {
@@ -16,6 +22,125 @@ export class GuideProfilePage {
       name: 'Create Experience',
       exact: true,
     });
+  }
+
+  /** Opens the gallery creation form from the guide profile. */
+  get createGalleryLink(): Locator {
+    return this.page.getByRole('link', {
+      name: 'Create Gallery',
+      exact: true,
+    });
+  }
+
+  /** Opens the Preview Profile page. */
+  get previewProfileLink(): Locator {
+    return this.page.getByRole('link', {
+      name: 'Preview Profile',
+      exact: true,
+    });
+  }
+
+  get shareProfileButton(): Locator {
+    return this.page
+      .getByRole('main')
+      .getByRole('button', { name: 'Share Profile', exact: true });
+  }
+
+  get editProfileLink(): Locator {
+    return this.page.getByRole('link', { name: 'Edit Profile', exact: true });
+  }
+
+  /** "About" section of the profile. */
+  get aboutSection(): Locator {
+    return this.page.locator('#guide-about');
+  }
+
+  /** Verify name, bio, and hosted experiences shown on the profile. */
+  async verifyProfileDetails(expected: {
+    firstName: string;
+    lastName: string;
+    bio: string;
+    experiences: string[];
+  }): Promise<void> {
+    const fullName = `${expected.firstName} ${expected.lastName}`;
+    const main = this.page.getByRole('main');
+
+    await expect(main.getByRole('heading', { level: 4, name: fullName, exact: true })).toBeVisible();
+    await expect(
+      this.aboutSection.getByRole('heading', { name: `About ${fullName}`, exact: true }),
+    ).toBeVisible();
+    await expect(this.aboutSection.getByText(expected.bio, { exact: true })).toBeVisible();
+
+    // Experiences are shown on one line, e.g. "A, B and C".
+    let experiencesLine = main.locator('p');
+    for (const experience of expected.experiences) {
+      experiencesLine = experiencesLine.filter({ hasText: experience });
+    }
+    await expect(experiencesLine.first()).toBeVisible();
+    // Remove each expected name (names like "Food and Beverage" contain "and"),
+    // then only separators should remain, so no old experience is still listed.
+    let leftover = await experiencesLine.first().innerText();
+    for (const experience of expected.experiences) {
+      leftover = leftover.replace(experience, '');
+    }
+    expect(
+      leftover.replace(/,|\band\b|\s/g, ''),
+      `Unexpected experiences on the profile: "${leftover.trim()}"`,
+    ).toBe('');
+  }
+
+  /** Profile Follow button; its label is "Follow" or "Unfollow" but both open Join the Journey. */
+  get followButton(): Locator {
+    return this.page
+      .getByRole('main')
+      .getByRole('link', { name: /^(Follow|Unfollow)$/ });
+  }
+
+  /** "Join the Journey" dialog for following a localite by email. */
+  get joinJourneyDialog(): Locator {
+    return this.page.getByRole('dialog').filter({
+      has: this.page.getByRole('heading', { name: 'Join the Journey' }),
+    });
+  }
+
+  /** Success message shown after following a localite. */
+  get followSuccessMessage(): Locator {
+    return this.page.getByText(/Localite has been followed successfully/i);
+  }
+
+  /** Open the Join the Journey dialog from the profile Follow button. */
+  async openFollowDialog(): Promise<void> {
+    await this.followButton.click();
+    await expect(this.joinJourneyDialog).toBeVisible();
+    await expect(this.joinJourneyDialog.getByText('Follow with Your Email')).toBeVisible();
+  }
+
+  /** Enter an email in Join the Journey and submit Follow. */
+  async followWithEmail(email: string): Promise<void> {
+    await this.joinJourneyDialog.getByRole('textbox', { name: 'you@company.com' }).fill(email);
+    await this.joinJourneyDialog.getByRole('button', { name: 'Follow', exact: true }).click();
+  }
+
+  /** Gallery section of the profile. */
+  get gallerySection(): Locator {
+    return this.page.locator('#guide-gallery');
+  }
+
+  /** Gallery card link in the profile Gallery section, matched by exact title. */
+  galleryLink(title: string): Locator {
+    return this.gallerySection.getByRole('link', { name: title, exact: true });
+  }
+
+  /** Return to the profile and verify that the gallery is displayed in the Gallery section. */
+  async verifyGalleryDisplayed(profileUrl: string, title: string): Promise<void> {
+    await this.page.goto(profileUrl);
+
+    const gallery = this.galleryLink(title);
+    await expect(gallery).toBeVisible({ timeout: 30_000 });
+    await expect(gallery).toHaveAttribute('href', /\/view-gallery\/\d+/);
+    await expect(
+      gallery.getByRole('heading', { name: title, exact: true }),
+    ).toBeVisible();
   }
 
   /** Find the profile entry for an experience by its exact title. */

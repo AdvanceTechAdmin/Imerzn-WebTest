@@ -1,0 +1,9 @@
+# New values entered on traveler Settings > Edit. Keep the Field names as written.
+# Phone is 10 digits without country code (United States +1).
+# State and City must match the dropdown option text; City must belong to the State.
+Field,Value
+First Name,Traveler
+Last Name,Automation
+Phone,2015550123
+State,California
+City,Los Angeles

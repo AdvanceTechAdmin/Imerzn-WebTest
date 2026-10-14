@@ -124,10 +124,34 @@ export class SignupPage {
     return this.availability();
   }
 
-  /** Fill in the traveler signup form with the supplied test data. */
+  /** "Sign Up" menu in the header; hovering it reveals Traveler and Localite links. */
+  get headerSignUpMenu(): Locator {
+    return this.page.getByRole('banner').getByText('Sign Up', { exact: true });
+  }
+
+  /** Subtitle confirming the Localite signup form is selected. */
+  get localiteSignupSubtitle(): Locator {
+    return this.page.getByText('Sign up to be a localite.', { exact: true });
+  }
+
+  /** Open the home page and choose Sign Up > Localite from the header menu. */
+  async openLocaliteSignupFromHome(): Promise<void> {
+    // The home page's "load" event can hang on third-party scripts, so wait for DOM only.
+    await this.page.goto('/', { waitUntil: 'domcontentloaded' });
+    await this.headerSignUpMenu.hover();
+    await this.page
+      .getByRole('banner')
+      .getByRole('link', { name: 'Localite', exact: true })
+      .click();
+
+    await expect(this.localiteSignupSubtitle).toBeVisible();
+  }
+
+  /** Fill in the signup form (Traveler or Localite) with the supplied test data. */
   async fillForm(data: SignupFormData): Promise<void> {
     await this.page.getByPlaceholder('Enter name').fill(data.firstName);
-    await this.page.getByPlaceholder('Enter last name').fill(data.lastName);
+    // Localite form reuses the "Enter last name" placeholder for Business Name, so target by name.
+    await this.page.locator('input[name="last_name"]').fill(data.lastName);
     await this.page.getByPlaceholder('you@company.com').fill(data.email);
 
     // Enter the phone number character by character for the phone input widget.
@@ -148,7 +172,13 @@ export class SignupPage {
 
   /** Accept the required consent and submit the signup form. */
   async submit(): Promise<void> {
-    await this.page.locator('label.checkbox-container').click();
+    // The real checkbox is visually hidden, so click its wrapping label.
+    const consentCheckbox = this.page.locator('input[name="terms_condition"]');
+    if (!(await consentCheckbox.isChecked())) {
+      await this.page.locator('label').filter({ has: consentCheckbox }).click();
+    }
+    await expect(consentCheckbox).toBeChecked();
+
     await this.page.getByRole('button', { name: /^sign up$/i }).click();
   }
 

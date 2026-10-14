@@ -12,6 +12,7 @@ import {
   splitList,
   type ExperienceData,
 } from '../../utils/experience-data';
+import { selectLocationSuggestion } from '../../utils/common';
 
 /**
  * Page Object for creating and publishing an experience.
@@ -132,8 +133,9 @@ export class CreateExperiencePage {
       ['drop_off_point', 'Enter drop location'],
     ] as const) {
       if (data[column].trim()) {
-        await this.fillLocationAutocomplete(
-          placeholder,
+        await selectLocationSuggestion(
+          this.page,
+          this.page.getByPlaceholder(placeholder),
           data[column].trim(),
         );
       }
@@ -250,21 +252,6 @@ export class CreateExperiencePage {
     await editor.fill(value);
   }
 
-  /** Choose an autocomplete suggestion and confirm the field accepted the selection. */
-  private async fillLocationAutocomplete(
-    placeholder: string,
-    value: string,
-  ): Promise<void> {
-    const input = this.page.getByPlaceholder(placeholder);
-    await input.fill(value);
-
-    const suggestion = this.page.getByText(value, { exact: true });
-    await expect(suggestion).toBeVisible();
-    await suggestion.click();
-
-    await expect(input).toHaveValue(value);
-  }
-
   /** Apply CSV Yes/No or True/False values, preserving the app default for blanks. */
   private async setCheckbox(
     checkbox: Locator,
@@ -288,7 +275,7 @@ export class CreateExperiencePage {
   private async uploadPrimaryImage(path: string): Promise<void> {
     if (!path.trim()) {
       throw new Error(
-        'Provide Primary Image in testdata/create-experience.csv.',
+        'Provide Primary Image in testdata/localite/create-experience.csv.',
       );
     }
 

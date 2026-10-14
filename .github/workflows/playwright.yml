@@ -35,7 +35,7 @@ jobs:
             echo "Missing AUTH_CSV_BASE64 GitHub secret"
             exit 1
           fi
-          printf '%s' "$AUTH_CSV_BASE64" | base64 --decode > testdata/auth.csv
+          printf '%s' "$AUTH_CSV_BASE64" | base64 --decode > testdata/common/auth.csv
 
       - name: Type check
         run: npm run typecheck

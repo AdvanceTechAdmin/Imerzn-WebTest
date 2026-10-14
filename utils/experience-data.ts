@@ -1,9 +1,11 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { parseCsv } from './common';
 
 export const experienceCsvPath = resolve(
   process.cwd(),
   'testdata',
+  'localite',
   'create-experience.csv',
 );
 
@@ -41,55 +43,8 @@ function isCompleteExperienceData(
   return Object.values(fieldNames).every((column) => column in data);
 }
 
-function parseCsv(csv: string): string[][] {
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let field = '';
-  let quoted = false;
-
-  for (let index = 0; index < csv.length; index += 1) {
-    const character = csv[index];
-    if (!quoted && row.length === 0 && field === '' && character === '#') {
-      while (index < csv.length && csv[index] !== '\n' && csv[index] !== '\r') {
-        index += 1;
-      }
-    } else if (character === '"' && quoted && csv[index + 1] === '"') {
-      field += '"';
-      index += 1;
-    } else if (character === '"') {
-      quoted = !quoted;
-    } else if (character === ',' && !quoted) {
-      row.push(field);
-      field = '';
-    } else if ((character === '\n' || character === '\r') && !quoted) {
-      if (character === '\r' && csv[index + 1] === '\n') {
-        index += 1;
-      }
-      row.push(field);
-      if (row.length > 1 || row.some((value) => value.trim() !== '')) {
-        rows.push(row);
-      }
-      row = [];
-      field = '';
-    } else {
-      field += character;
-    }
-  }
-
-  if (field !== '' || row.length > 0) {
-    row.push(field);
-    if (row.length > 1 || row.some((value) => value.trim() !== '')) {
-      rows.push(row);
-    }
-  }
-  if (quoted) {
-    throw new Error(`Unclosed quoted field in ${experienceCsvPath}.`);
-  }
-  return rows;
-}
-
 export async function readExperienceData(): Promise<ExperienceData> {
-  const [headers, ...records] = parseCsv(await readFile(experienceCsvPath, 'utf8'));
+  const [headers, ...records] = parseCsv(await readFile(experienceCsvPath, 'utf8'), experienceCsvPath);
   if (headers?.[0]?.trim().toLowerCase() !== 'field' ||
       headers[1]?.trim().toLowerCase() !== 'value') {
     throw new Error(`Expected Field,Value headers in ${experienceCsvPath}.`);
@@ -125,7 +80,7 @@ export async function readExperienceData(): Promise<ExperienceData> {
   }
   if (!data.title?.trim()) {
     throw new Error(
-      'Enter a title in testdata/create-experience.csv before running Create Experience.',
+      'Enter a title in testdata/localite/create-experience.csv before running Create Experience.',
     );
   }
   return data;
