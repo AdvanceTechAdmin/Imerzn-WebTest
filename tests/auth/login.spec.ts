@@ -2,6 +2,12 @@ import { expect, test } from '@playwright/test';
 import { LoginPage } from '../../pages/auth/login-page';
 import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
 import { readAuthData } from '../../utils/auth-data';
+import { autoCloseNewsletterPopup } from '../../utils/common';
+
+// Keep the newsletter popup and cookie banner from covering the login form.
+test.beforeEach(async ({ page }) => {
+  await autoCloseNewsletterPopup(page);
+});
 
 // Test 1: Verify that an unregistered email cannot log in.
 

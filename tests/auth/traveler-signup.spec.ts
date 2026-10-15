@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { SignupPage } from '../../pages/auth/signup-page';
 import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
 import { createSignupFormData, readAuthData } from '../../utils/auth-data';
-import { closeNewsletterPopupIfVisible } from '../../utils/common';
+import { autoCloseNewsletterPopup, closeNewsletterPopupIfVisible } from '../../utils/common';
 import { saveCreatedTraveler } from '../../utils/created-localite';
 
 test('AUTH-003 | Traveler can complete the signup process', async ({ page }) => {
@@ -17,6 +17,8 @@ test('AUTH-003 | Traveler can complete the signup process', async ({ page }) => 
   const authData = await readAuthData();
   const signupData = createSignupFormData(authData);
   const signupPage = new SignupPage(page);
+
+  await autoCloseNewsletterPopup(page);
 
   // Step 1: Open the signup page and select Traveler.
   const availability = await signupPage.openTravelerSignup();

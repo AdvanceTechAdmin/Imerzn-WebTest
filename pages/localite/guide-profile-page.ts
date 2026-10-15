@@ -110,8 +110,15 @@ export class GuideProfilePage {
 
   /** Open the Join the Journey dialog from the profile Follow button. */
   async openFollowDialog(): Promise<void> {
-    await this.followButton.click();
-    await expect(this.joinJourneyDialog).toBeVisible();
+    // The button has no label or action until the page has loaded the follow status, and a click
+    // in that moment does nothing. Retry until the dialog opens (opening it twice is harmless).
+    await expect(this.followButton).toBeVisible({ timeout: 30_000 });
+    await expect(async () => {
+      if (!(await this.joinJourneyDialog.isVisible())) {
+        await this.followButton.click();
+      }
+      await expect(this.joinJourneyDialog).toBeVisible({ timeout: 3_000 });
+    }).toPass({ timeout: 30_000 });
     await expect(this.joinJourneyDialog.getByText('Follow with Your Email')).toBeVisible();
   }
 

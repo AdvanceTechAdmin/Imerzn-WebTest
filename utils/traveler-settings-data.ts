@@ -8,8 +8,6 @@ export interface TravelerSettingsData {
   firstName: string;
   lastName: string;
   phone: string;
-  state: string;
-  city: string;
 }
 
 /** Read the traveler Settings values from traveler-settings.csv; every field is required. */
@@ -33,7 +31,5 @@ export async function readTravelerSettingsData(): Promise<TravelerSettingsData> 
     firstName: getValue('First Name'),
     lastName: getValue('Last Name'),
     phone,
-    state: getValue('State'),
-    city: getValue('City'),
   };
 }

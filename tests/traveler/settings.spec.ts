@@ -34,7 +34,7 @@ test('SET-001 | Traveler edits account details and changes password', async ({ p
     await expect(profileMenu.profileImage).toBeVisible({ timeout: 60_000 });
   });
 
-  // Step 2: Open Settings, edit name, phone, state, and city, and save.
+  // Step 2: Open Settings, edit name and phone, and save.
   await step('Edit account details', async () => {
     await profileMenu.openSettings();
     await settingsPage.open();

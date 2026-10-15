@@ -217,6 +217,14 @@ async saveCroppedProfilePicture(): Promise<void> {
 
   /** Submit the completed profile. */
   async submitProfile(): Promise<void> {
-    await this.profileSubmitButton.click();
+    // State/City load a few seconds after the form. Submitting before that fails the page's own
+    // check ("State is required") and the form stays open, so retry until the form is accepted.
+    // State and City are never changed.
+    await expect(async () => {
+      if (await this.profileSubmitButton.isVisible()) {
+        await this.profileSubmitButton.click();
+      }
+      await expect(this.profileSubmitButton).toBeHidden({ timeout: 5_000 });
+    }).toPass({ timeout: 45_000 });
   }
 }

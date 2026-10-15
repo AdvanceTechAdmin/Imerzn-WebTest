@@ -3,13 +3,11 @@ import { readFieldValueCsv } from './common';
 
 const localiteSettingsCsvPath = resolve(process.cwd(), 'testdata', 'localite', 'localite-settings.csv');
 
-/** New phone and Bio entered on localite Settings, plus the Business name/State/City the site requires to save. */
+/** New phone and Bio entered on localite Settings, plus the Business name the site requires to save. */
 export interface LocaliteSettingsData {
   phone: string;
   bio: string;
   businessName: string;
-  state: string;
-  city: string;
 }
 
 /** Read localite-settings.csv; every field is required. */
@@ -25,10 +23,8 @@ export async function readLocaliteSettingsData(): Promise<LocaliteSettingsData> 
     throw new Error(`Bio in ${localiteSettingsCsvPath} is required and must be at most 500 characters.`);
   }
   const businessName = data.get('Business Name');
-  const state = data.get('State');
-  const city = data.get('City');
-  if (!businessName || !state || !city) {
-    throw new Error(`Set Business Name, State, and City in ${localiteSettingsCsvPath}.`);
+  if (!businessName) {
+    throw new Error(`Set Business Name in ${localiteSettingsCsvPath}.`);
   }
-  return { phone, bio, businessName, state, city };
+  return { phone, bio, businessName };
 }

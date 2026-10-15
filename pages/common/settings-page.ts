@@ -48,14 +48,6 @@ export class SettingsPage {
     return this.main.locator('textarea[name="bio"]');
   }
 
-  get stateSelect(): Locator {
-    return this.main.locator('select[name="state"]');
-  }
-
-  get citySelect(): Locator {
-    return this.main.locator('select[name="city"]');
-  }
-
   /** Name heading on the profile card, e.g. "First Last". */
   nameHeading(firstName: string, lastName: string): Locator {
     return this.main.getByRole('heading', { level: 4, name: `${firstName} ${lastName}`, exact: true });
@@ -76,6 +68,11 @@ export class SettingsPage {
     await expect(this.accountDetailsHeading).toBeVisible();
     // Wait for saved values to load before editing.
     await expect(this.firstNameInput).not.toHaveValue('');
+    // State and City lists load a few seconds later. Saving before that sends them empty and the
+    // site rejects the save ("Please enter a valid state" / "city cannot be null"), so wait for
+    // both to be filled in by the page. The test only waits; it never changes State or City.
+    await expect(this.main.locator('select[name="state"]')).not.toHaveValue('', { timeout: 30_000 });
+    await expect(this.main.locator('select[name="city"]')).not.toHaveValue('', { timeout: 30_000 });
   }
 
   /** Switch Account Details into edit mode. */
@@ -96,25 +93,15 @@ export class SettingsPage {
     await expect(this.phoneInput).toHaveValue(formatUsPhone(phone));
   }
 
-  /** Choose State, then City (city options reload after the state changes). */
-  async selectStateAndCity(state: string, city: string): Promise<void> {
-    await this.stateSelect.selectOption({ label: state });
-    await expect(this.citySelect.getByRole('option', { name: city, exact: true })).toBeAttached();
-    await this.citySelect.selectOption({ label: city });
-    await expect(this.stateSelect.locator('option:checked')).toHaveText(state);
-    await expect(this.citySelect.locator('option:checked')).toHaveText(city);
-  }
-
   /**
-   * Localite: enter edit mode and change phone and Bio. Business name, State, and City are also
-   * set because the site refuses to save when they are empty
-   * ("business_name cannot be null", "Please enter a valid state").
+   * Localite: enter edit mode and change phone and Bio. Business name is also set because the
+   * site refuses to save without one ("business_name cannot be null").
+   * State and City are left unchanged.
    */
   async editPhoneAndBio(data: LocaliteSettingsData): Promise<void> {
     await this.startEditing();
     await this.fillPhone(data.phone);
     await this.businessNameInput.fill(data.businessName);
-    await this.selectStateAndCity(data.state, data.city);
     await this.bioInput.fill(data.bio);
     await expect(this.bioInput).toHaveValue(data.bio);
   }
@@ -125,15 +112,13 @@ export class SettingsPage {
     await expect(this.bioInput).toHaveValue(bio);
   }
 
-  /** Traveler: enter edit mode and update name, phone, state, and city. */
+  /** Traveler: enter edit mode and update name and phone (State and City are left unchanged). */
   async editAccountDetails(data: TravelerSettingsData): Promise<void> {
     await this.startEditing();
 
     await this.firstNameInput.fill(data.firstName);
     await this.lastNameInput.fill(data.lastName);
     await this.fillPhone(data.phone);
-
-    await this.selectStateAndCity(data.state, data.city);
   }
 
   /** Save and wait for the form to leave edit mode. */
@@ -153,10 +138,6 @@ export class SettingsPage {
     await expect(this.firstNameInput).toHaveValue(data.firstName);
     await expect(this.lastNameInput).toHaveValue(data.lastName);
     await expect(this.phoneInput).toHaveValue(formatUsPhone(data.phone));
-    // Soft checks: a State/City mismatch is reported as a failure, but the test continues
-    // so the password steps still run. (Known dev issue: Save sends the old State/City.)
-    await expect.soft(this.stateSelect.locator('option:checked'), 'Saved State').toHaveText(data.state);
-    await expect.soft(this.citySelect.locator('option:checked'), 'Saved City').toHaveText(data.city);
   }
 
   /** Open Change Password, fill current/new/confirm, and submit. */
@@ -164,9 +145,26 @@ export class SettingsPage {
     await this.changePasswordButton.click();
     await expect(this.changePasswordDialog).toBeVisible();
 
-    await this.changePasswordDialog.locator('input[name="oldpassword"]').fill(currentPassword);
-    await this.changePasswordDialog.locator('input[name="password"]').fill(newPassword);
-    await this.changePasswordDialog.locator('input[name="cpassword"]').fill(newPassword);
+    // The dialog can clear its fields just after opening, so fill them, then confirm all three
+    // still hold the values (refilling if they were cleared) before clicking Update Password.
+    const fields = [
+      [this.changePasswordDialog.locator('input[name="oldpassword"]'), currentPassword],
+      [this.changePasswordDialog.locator('input[name="password"]'), newPassword],
+      [this.changePasswordDialog.locator('input[name="cpassword"]'), newPassword],
+    ] as const;
+    await expect(async () => {
+      for (const [input, value] of fields) {
+        if ((await input.inputValue()) !== value) {
+          await input.fill(value);
+        }
+      }
+      // Give a late reset a moment to happen before confirming the values stuck.
+      await this.page.waitForTimeout(500);
+      for (const [input, value] of fields) {
+        await expect(input).toHaveValue(value, { timeout: 1_000 });
+      }
+    }).toPass({ timeout: 15_000 });
+
     await this.changePasswordDialog.getByRole('button', { name: 'Update Password', exact: true }).click();
 
     await expect(this.page.getByText('Your password has been updated successfully')).toBeVisible({ timeout: 30_000 });

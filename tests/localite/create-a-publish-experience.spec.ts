@@ -6,7 +6,7 @@ import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
 import { LoginPage } from '../../pages/auth/login-page';
 import { getLocaliteAccount, saveCreatedContent } from '../../utils/created-localite';
 import { readExperienceData } from '../../utils/experience-data';
-import { closeNewsletterPopupIfVisible, step } from '../../utils/common';
+import { autoCloseNewsletterPopup, closeNewsletterPopupIfVisible, step } from '../../utils/common';
 
 test('Create Experience', async ({ page }) => {
   // Pre-setup: Prepare test data and page objects.
@@ -25,6 +25,8 @@ test('Create Experience', async ({ page }) => {
   const profilePage = new GuideProfilePage(page);
   const createExperiencePage = new CreateExperiencePage(page);
   const findTouristGuidePage = new FindTouristGuidePage(page);
+
+  await autoCloseNewsletterPopup(page);
 
   // Steps 1: Sign in to the test account.
   await step('Sign in to the test account', async () => {

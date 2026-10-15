@@ -12,7 +12,10 @@ test('PRF-002 | Localite edits name, bio, and hosted experiences', async ({ page
   // Pre-setup: Localite account and new profile values from edit-profile.csv.
   const localite = await getLocaliteAccount();
   const data = await readEditProfileData();
-  test.info().annotations.push({ type: 'Localite email', description: localite.email });
+  test.info().annotations.push(
+    { type: 'Localite email', description: localite.email },
+    { type: 'New localite name', description: `${data.firstName} ${data.lastName}` },
+  );
 
   const loginPage = new LoginPage(page);
   const profilePage = new GuideProfilePage(page);
