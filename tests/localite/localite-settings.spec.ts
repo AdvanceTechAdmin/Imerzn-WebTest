@@ -2,14 +2,14 @@ import { expect, test } from '@playwright/test';
 import { LoginPage } from '../../pages/auth/login-page';
 import { SettingsPage } from '../../pages/common/settings-page';
 import { ProfileMenu } from '../../pages/components/profile-menu';
-import { readAuthData } from '../../utils/auth-data';
-import { autoCloseNewsletterPopup, step } from '../../utils/common';
+import { readAuthData } from '../../utils/common/auth-data';
+import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
 import {
   readCreatedLocalite,
   saveCreatedContent,
   saveCreatedLocalite,
-} from '../../utils/created-localite';
-import { readLocaliteSettingsData } from '../../utils/localite-settings-data';
+} from '../../utils/localite/created-localite';
+import { readLocaliteSettingsData } from '../../utils/localite/localite-settings-data';
 
 test('SET-002 | Localite edits phone and Bio and changes password', async ({ page }) => {
   test.setTimeout(150_000);

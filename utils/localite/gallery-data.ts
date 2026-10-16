@@ -1,8 +1,7 @@
 import { randomInt } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { readFieldValueCsv } from './common';
-import { splitList } from './experience-data';
+import { readFieldValueCsv, splitList } from '../common/common';
 
 const galleryCsvPath = resolve(process.cwd(), 'testdata', 'localite', 'create-gallery.csv');
 

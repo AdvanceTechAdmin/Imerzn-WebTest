@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { selectLocationSuggestion } from '../../utils/common';
-import type { GalleryData } from '../../utils/gallery-data';
+import { selectLocationSuggestion } from '../../utils/common/common';
+import type { GalleryData } from '../../utils/localite/gallery-data';
 
 /** Page Object for the Create Gallery form (/create-gallery). */
 export class CreateGalleryPage {

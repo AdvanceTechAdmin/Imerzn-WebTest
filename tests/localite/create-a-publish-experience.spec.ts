@@ -4,9 +4,9 @@ import { CreateExperiencePage } from '../../pages/localite/create-experience-pag
 import { FindTouristGuidePage } from '../../pages/localite/find-tourist-guide-page';
 import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
 import { LoginPage } from '../../pages/auth/login-page';
-import { getLocaliteAccount, saveCreatedContent } from '../../utils/created-localite';
-import { readExperienceData } from '../../utils/experience-data';
-import { autoCloseNewsletterPopup, closeNewsletterPopupIfVisible, step } from '../../utils/common';
+import { getLocaliteAccount, saveCreatedContent } from '../../utils/localite/created-localite';
+import { readExperienceData } from '../../utils/localite/experience-data';
+import { autoCloseNewsletterPopup, closeNewsletterPopupIfVisible, step } from '../../utils/common/common';
 
 test('Create Experience', async ({ page }) => {
   // Pre-setup: Prepare test data and page objects.

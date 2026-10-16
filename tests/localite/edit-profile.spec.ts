@@ -2,9 +2,9 @@ import { expect, test } from '@playwright/test';
 import { LoginPage } from '../../pages/auth/login-page';
 import { EditProfilePage } from '../../pages/localite/edit-profile-page';
 import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
-import { autoCloseNewsletterPopup, step } from '../../utils/common';
-import { getLocaliteAccount, saveCreatedContent } from '../../utils/created-localite';
-import { readEditProfileData } from '../../utils/edit-profile-data';
+import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
+import { getLocaliteAccount, saveCreatedContent } from '../../utils/localite/created-localite';
+import { readEditProfileData } from '../../utils/localite/edit-profile-data';
 
 test('PRF-002 | Localite edits name, bio, and hosted experiences', async ({ page }) => {
   test.setTimeout(90_000);

@@ -54,6 +54,16 @@ export class FindTouristGuidePage {
     return { title, href, card };
   }
 
+  /** Open an experience from the results by its exact title (the card image's alt text). */
+  async openExperience(title: string): Promise<void> {
+    const card = this.page.locator('.experience-list-cards').filter({
+      has: this.page.locator(`img[alt="${title}"]`),
+      visible: true,
+    }).first();
+    await expect(card).toBeVisible({ timeout: 30_000 });
+    await card.locator('a[href*="/details/"]').first().click();
+  }
+
   /** Click the heart on a card and wait for the Save to wishlist dialog. */
   async openSaveToWishlist(experience: ExperienceCard): Promise<void> {
     await experience.card.getByRole('button', { name: 'Save to Wishlist' }).click();

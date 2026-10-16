@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import type { LocaliteSettingsData } from '../../utils/localite-settings-data';
-import type { TravelerSettingsData } from '../../utils/traveler-settings-data';
+import type { LocaliteSettingsData } from '../../utils/localite/localite-settings-data';
+import type { TravelerSettingsData } from '../../utils/traveler/traveler-settings-data';
 
 /**
  * Page Object for Settings (/dashboard/settings), shared by travelers and localites:

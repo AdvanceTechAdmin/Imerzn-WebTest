@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { LoginPage } from '../../pages/auth/login-page';
 import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
-import { autoCloseNewsletterPopup, step } from '../../utils/common';
-import { getLocaliteAccount } from '../../utils/created-localite';
+import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
+import { getLocaliteAccount } from '../../utils/localite/created-localite';
 
 test('PRF-003 | Localite opens and closes Profile Sharing from the profile', async ({ page }) => {
   test.setTimeout(90_000);

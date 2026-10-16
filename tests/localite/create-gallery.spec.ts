@@ -2,9 +2,9 @@ import { expect, test } from '@playwright/test';
 import { LoginPage } from '../../pages/auth/login-page';
 import { CreateGalleryPage } from '../../pages/localite/create-gallery-page';
 import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
-import { autoCloseNewsletterPopup, step } from '../../utils/common';
-import { getLocaliteAccount, saveCreatedContent } from '../../utils/created-localite';
-import { readGalleryData } from '../../utils/gallery-data';
+import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
+import { getLocaliteAccount, saveCreatedContent } from '../../utils/localite/created-localite';
+import { readGalleryData } from '../../utils/localite/gallery-data';
 
 test('GAL-001 | Localite creates a gallery and it appears on the profile', async ({ page }) => {
   test.setTimeout(90_000);

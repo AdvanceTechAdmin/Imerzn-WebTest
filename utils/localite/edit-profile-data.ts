@@ -1,7 +1,6 @@
 import { randomInt } from 'node:crypto';
 import { resolve } from 'node:path';
-import { readFieldValueCsv } from './common';
-import { splitList } from './experience-data';
+import { readFieldValueCsv, splitList } from '../common/common';
 
 const editProfileCsvPath = resolve(process.cwd(), 'testdata', 'localite', 'edit-profile.csv');
 

@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { selectLocationSuggestion } from '../../utils/common';
-import type { StoryFormData } from '../../utils/story-data';
+import { selectLocationSuggestion } from '../../utils/common/common';
+import type { StoryFormData } from '../../utils/traveler/story-data';
 
 /**
  * Page Object for traveler stories: the header Stories menu, My Stories (/my-stories),
@@ -98,7 +98,15 @@ export class StoriesPage {
     await this.mediaInput.setInputFiles(imagePath);
     await expect(this.main.getByRole('img', { name: 'preview-0' })).toBeVisible();
 
+    // Check the save request itself, so a server error is reported clearly
+    // (the page shows no message and just stays on the form).
+    const saveResponse = this.page.waitForResponse(
+      (response) => /\/traveller\/save-Ai-experience/i.test(response.url()) && response.request().method() === 'POST',
+      { timeout: 60_000 },
+    );
     await this.submitButton.click();
+    const response = await saveResponse;
+    expect(response.ok(), `Save story request failed: HTTP ${response.status()} ${await response.text().catch(() => '')}`.slice(0, 500)).toBe(true);
     await expect(this.page).toHaveURL(/\/my-stories/, { timeout: 30_000 });
   }
 

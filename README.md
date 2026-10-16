@@ -32,6 +32,14 @@ $env:RUN_SIGNUP_TEST='true'; $env:CI='true'; npx playwright test --workers=1 --r
 
 Signup tests create real accounts, so they are skipped unless `RUN_SIGNUP_TEST=true` (in `.env` or the shell).
 
+With `--workers=1`, all other tests run first (in file order), then the booking flow, in the order set by `bookingFlow` in `playwright.config.ts`:
+
+1. Book experiences (BKG-001)
+2. Traveler dashboard after bookings (DSH-002)
+3. Localite dashboard after bookings (LBK-001)
+4. Traveler cancels bookings (CNL-001)
+5. Localite cancels bookings (LCN-001)
+
 ## Tests
 
 | Folder | Test | Script |
@@ -46,7 +54,14 @@ Signup tests create real accounts, so they are skipped unless `RUN_SIGNUP_TEST=t
 | | Settings: phone, Bio, password (SET-002) | `test:localite-settings` |
 | | Preview profile (PRF-001) | `test:preview-profile` |
 | | Share profile (PRF-003) | `test:share-profile` |
-| `traveler/` | Search experience and localite (SRCH-001) | `test:search` |
+| | Localite view of the bookings: transactions, earnings, dashboard (LBK-001) | `test:localite-bookings` |
+| | Localite cancels an Ongoing and a Pending booking; traveler sees them cancelled (LCN-001) | `test:localite-cancel-booking` |
+| `traveler/` | Dashboard empty states for a new traveler (DSH-001) | `test:dashboard` |
+| | Book and pay for an experience with a promo code (BKG-001) | `test:booking` |
+| | Traveler cancels an Ongoing and a Pending booking; localite sees them cancelled (CNL-001) | `test:cancel-booking` |
+| | Experience details: wishlist, share, like, message (EXP-001) | `test:experience-details` |
+| | Dashboard, My Bookings, Transactions after booking (DSH-002) | `test:my-bookings-dashboard` |
+| | Search for the created localite (SRCH-001) | `test:search` |
 | | Settings: details, password (SET-001) | `test:traveler-settings` |
 | | Create and edit a story (STR-001) | `test:stories` |
 | | Wishlist (WSH-001) | `test:wishlist` |
@@ -76,7 +91,7 @@ Edit the **Value** column of a CSV to change test data; keep the **Field** names
 ```
 tests/       Test cases (auth, localite, traveler)
 pages/       Page objects (admin, auth, common, components, localite, traveler)
-utils/       Shared helpers and test-data readers
+utils/       Shared helpers and test-data readers (common, localite, traveler)
 testdata/    CSV data and images
 ```
 

@@ -2,10 +2,10 @@ import { expect, test } from '@playwright/test';
 import { LoginPage } from '../../pages/auth/login-page';
 import { ProfileMenu } from '../../pages/components/profile-menu';
 import { SettingsPage } from '../../pages/common/settings-page';
-import { readAuthData } from '../../utils/auth-data';
-import { autoCloseNewsletterPopup, step } from '../../utils/common';
-import { getTravelerAccount, saveCreatedTraveler } from '../../utils/created-localite';
-import { readTravelerSettingsData } from '../../utils/traveler-settings-data';
+import { readAuthData } from '../../utils/common/auth-data';
+import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
+import { getTravelerAccount, saveCreatedTraveler } from '../../utils/traveler/created-traveler';
+import { readTravelerSettingsData } from '../../utils/traveler/traveler-settings-data';
 
 test('SET-001 | Traveler edits account details and changes password', async ({ page }) => {
   test.setTimeout(150_000);

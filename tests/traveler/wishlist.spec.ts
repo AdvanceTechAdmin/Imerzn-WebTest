@@ -3,9 +3,9 @@ import { LoginPage } from '../../pages/auth/login-page';
 import { ProfileMenu } from '../../pages/components/profile-menu';
 import { FindTouristGuidePage } from '../../pages/localite/find-tourist-guide-page';
 import { WishlistPage } from '../../pages/traveler/wishlist-page';
-import { autoCloseNewsletterPopup, step } from '../../utils/common';
-import { getTravelerAccount } from '../../utils/created-localite';
-import { readWishlistName } from '../../utils/wishlist-data';
+import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
+import { getTravelerAccount } from '../../utils/traveler/created-traveler';
+import { readWishlistName } from '../../utils/traveler/wishlist-data';
 
 test('WSH-001 | Traveler creates a wishlist and saves an experience to it', async ({ page }) => {
   test.setTimeout(120_000);

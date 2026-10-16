@@ -1,0 +1,33 @@
+# Experience booking test data. Keep the Field names as written.
+# Days From Today: booking date = today + this many days (1 = tomorrow).
+# Credit Per Person: credit the promo code gives for each person in the group.
+# Card details are a Stripe test card. Billing Location is picked from the suggestions first,
+# because choosing it resets Address Line and Zip; Address and Zip are filled after it.
+Field,Value
+Days From Today,1
+Group Size,4
+Note,"Automation booking note: looking forward to the experience with my group."
+Promo Code,AUTOCODE
+Credit Per Person,10
+Card Number,4111111111111111
+Card Expiry,11/30
+Card CVV,123
+Billing Full Name,Traveler Automation
+Billing Location,"New York, NY, USA"
+Billing Address,350 5th Ave
+Billing Zip,10118
+# Second booking left unpaid (pending): booked, then the Payment dialog is cancelled.
+Pending Days From Today,2
+Pending Group Size,3
+Pending Note,"This is pending booking created by automation, it is not paid."
+# Second paid booking: no promo code, paid with the same card and billing address.
+Paid 2 Days From Today,3
+Paid 2 Group Size,2
+Paid 2 Note,"Second paid booking created by automation, no promo code."
+# Second pending booking: booked, then the Payment dialog is cancelled.
+Pending 2 Days From Today,4
+Pending 2 Group Size,2
+Pending 2 Note,"Second pending booking created by automation, it is not paid."
+# Reason entered when the traveler cancels a booking (cancel-booking test).
+Cancel Reason,"Automation test: plans changed, cancelling this trip."
+Localite Cancel Reason,"Automation test: guide unavailable, cancelling this booking."

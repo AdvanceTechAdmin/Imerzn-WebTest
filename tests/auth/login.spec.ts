@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { LoginPage } from '../../pages/auth/login-page';
 import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
-import { readAuthData } from '../../utils/auth-data';
-import { autoCloseNewsletterPopup } from '../../utils/common';
+import { readAuthData } from '../../utils/common/auth-data';
+import { autoCloseNewsletterPopup } from '../../utils/common/common';
 
 // Keep the newsletter popup and cookie banner from covering the login form.
 test.beforeEach(async ({ page }) => {

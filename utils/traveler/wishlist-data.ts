@@ -1,6 +1,6 @@
 import { randomInt } from 'node:crypto';
 import { resolve } from 'node:path';
-import { readFieldValueCsv } from './common';
+import { readFieldValueCsv } from '../common/common';
 
 const wishlistCsvPath = resolve(process.cwd(), 'testdata', 'traveler', 'wishlist.csv');
 

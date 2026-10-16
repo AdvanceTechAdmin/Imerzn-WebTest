@@ -1,5 +1,5 @@
 import { resolve } from 'node:path';
-import { readFieldValueCsv } from './common';
+import { readFieldValueCsv } from '../common/common';
 
 const travelerSettingsCsvPath = resolve(process.cwd(), 'testdata', 'traveler', 'traveler-settings.csv');
 

@@ -9,10 +9,10 @@ import {
 } from '@playwright/test';
 import {
   parseBoolean,
-  splitList,
   type ExperienceData,
-} from '../../utils/experience-data';
-import { selectLocationSuggestion } from '../../utils/common';
+} from '../../utils/localite/experience-data';
+import { splitList } from '../../utils/common/common';
+import { selectLocationSuggestion } from '../../utils/common/common';
 
 /**
  * Page Object for creating and publishing an experience.

@@ -1,7 +1,7 @@
 import { randomInt } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { readFieldValueCsv } from './common';
+import { readFieldValueCsv } from '../common/common';
 
 const storyCsvPath = resolve(process.cwd(), 'testdata', 'traveler', 'story.csv');
 

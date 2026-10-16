@@ -9,7 +9,9 @@ export class LoginPage {
    * Wait until the email field is visible before continuing.
    */
   async open(): Promise<void> {
-    await this.page.goto('/login');
+    // Wait for the page structure only: third-party scripts can delay the full "load" event,
+    // and the email field check below confirms the form is ready.
+    await this.page.goto('/login', { waitUntil: 'domcontentloaded' });
 
     await this.page
       .getByPlaceholder('you@company.com')

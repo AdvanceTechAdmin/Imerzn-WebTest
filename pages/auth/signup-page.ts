@@ -210,10 +210,24 @@ get saveCroppedPictureButton(): Locator {
   });
 }
 
-/** Save the cropped profile picture. */
-async saveCroppedProfilePicture(): Promise<void> {
-  await this.saveCroppedPictureButton.click();
-}
+  /** Crop Profile Picture dialog shown after choosing an image. */
+  get cropDialog(): Locator {
+    return this.page.getByRole('dialog').filter({ hasText: 'Crop Profile Picture' });
+  }
+
+  /**
+   * Save the cropped profile picture and wait for the Crop dialog to close.
+   * A click while the image is still loading can be ignored, so retry until it closes.
+   */
+  async saveCroppedProfilePicture(): Promise<void> {
+    await expect(this.cropDialog).toBeVisible();
+    await expect(async () => {
+      if (await this.cropDialog.isVisible()) {
+        await this.cropDialog.getByRole('button', { name: 'Save', exact: true }).click({ timeout: 5_000 });
+      }
+      await expect(this.cropDialog).toBeHidden({ timeout: 5_000 });
+    }).toPass({ timeout: 30_000 });
+  }
 
   /** Submit the completed profile. */
   async submitProfile(): Promise<void> {

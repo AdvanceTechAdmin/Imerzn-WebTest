@@ -19,7 +19,16 @@ export async function selectLocationSuggestion(
 
   const suggestion = page.getByText(value, { exact: true });
   await expect(suggestion).toBeVisible();
+  // Picking a suggestion makes the page fetch the place details (latitude/longitude) from Google.
+  // Submitting before they arrive saves the form without coordinates (the server rejects it with
+  // HTTP 500), so wait for that response. Forms that do not fetch details just continue.
+  const placeDetails = page
+    .waitForResponse((response) => /Places\/GetPlace/.test(response.url()), { timeout: 15_000 })
+    .catch(() => undefined);
   await suggestion.click();
+  await placeDetails;
+  // Give the page a moment to store the coordinates from the response.
+  await page.waitForTimeout(500);
 
   await expect(input).toHaveValue(value);
 }
@@ -184,4 +193,9 @@ export async function step<T>(title: string, action: () => Promise<T>): Promise<
       throw new Error(`Step "${title}" failed: ${message}`, { cause: error });
     }
   });
+}
+
+/** Split a "|"-separated CSV value into trimmed, non-empty items. */
+export function splitList(value: string): string[] {
+  return value.split('|').map((item) => item.trim()).filter(Boolean);
 }

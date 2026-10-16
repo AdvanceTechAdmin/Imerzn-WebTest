@@ -2,9 +2,9 @@ import { expect, test } from '@playwright/test';
 import { resolve } from 'node:path';
 import { SignupPage } from '../../pages/auth/signup-page';
 import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
-import { createSignupFormData, readAuthData } from '../../utils/auth-data';
-import { autoCloseNewsletterPopup, closeNewsletterPopupIfVisible } from '../../utils/common';
-import { saveCreatedTraveler } from '../../utils/created-localite';
+import { createSignupFormData, readAuthData } from '../../utils/common/auth-data';
+import { autoCloseNewsletterPopup, closeNewsletterPopupIfVisible } from '../../utils/common/common';
+import { saveCreatedTraveler } from '../../utils/traveler/created-traveler';
 
 test('AUTH-003 | Traveler can complete the signup process', async ({ page }) => {
   // Run only when explicitly enabled because signup may trigger real SMS verification.

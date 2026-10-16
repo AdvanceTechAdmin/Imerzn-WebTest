@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { LoginPage } from '../../pages/auth/login-page';
 import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
-import { createFollowerEmail, readAuthData } from '../../utils/auth-data';
-import { autoCloseNewsletterPopup, step } from '../../utils/common';
-import { getLocaliteAccount } from '../../utils/created-localite';
+import { createFollowerEmail, readAuthData } from '../../utils/common/auth-data';
+import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
+import { getLocaliteAccount } from '../../utils/localite/created-localite';
 
 test('FOL-001 | Follow a localite by email from the profile', async ({ page }) => {
   test.setTimeout(90_000);

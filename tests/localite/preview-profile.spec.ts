@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test';
 import { LoginPage } from '../../pages/auth/login-page';
 import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
 import { PreviewProfilePage } from '../../pages/localite/preview-profile-page';
-import { autoCloseNewsletterPopup, step } from '../../utils/common';
-import { getLocaliteAccount, readCreatedContent } from '../../utils/created-localite';
+import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
+import { getLocaliteAccount, readCreatedContent } from '../../utils/localite/created-localite';
 
 test('PRF-001 | Localite previews profile, follows, shares, and goes back', async ({ page }) => {
   test.setTimeout(90_000);

@@ -2,9 +2,9 @@ import { expect, test } from '@playwright/test';
 import { LoginPage } from '../../pages/auth/login-page';
 import { ProfileMenu } from '../../pages/components/profile-menu';
 import { StoriesPage } from '../../pages/traveler/stories-page';
-import { autoCloseNewsletterPopup, step } from '../../utils/common';
-import { getTravelerAccount } from '../../utils/created-localite';
-import { readStoryData } from '../../utils/story-data';
+import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
+import { getTravelerAccount } from '../../utils/traveler/created-traveler';
+import { readStoryData } from '../../utils/traveler/story-data';
 
 test('STR-001 | Traveler creates, edits, and publishes a story', async ({ page }) => {
   test.setTimeout(150_000);

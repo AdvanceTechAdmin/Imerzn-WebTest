@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { readAuthData } from './auth-data';
+import { readAuthData } from '../common/auth-data';
 
 // Local-only file that hands the localite created by LOC-001 to later tests.
 const createdLocalitePath = resolve(process.cwd(), 'testdata', 'localite', 'created-localite.json');
@@ -90,36 +90,4 @@ export async function saveCreatedContent(email: string, content: CreatedContent)
 /** Read the content recorded for a localite (empty if nothing was created yet). */
 export async function readCreatedContent(email: string): Promise<CreatedContent> {
   return (await readAllCreatedContent())[email] ?? {};
-}
-
-// Local-only file that hands the traveler created by AUTH-003 to later tests.
-const createdTravelerPath = resolve(process.cwd(), 'testdata', 'traveler', 'created-traveler.json');
-
-export interface TravelerAccount {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-}
-
-/** Save the traveler account created by the traveler signup test. */
-export async function saveCreatedTraveler(account: TravelerAccount): Promise<void> {
-  await writeFile(createdTravelerPath, `${JSON.stringify(account, null, 2)}\n`, 'utf8');
-}
-
-/** Traveler account saved by AUTH-003; fails with a clear message if it has not run yet. */
-export async function getTravelerAccount(): Promise<TravelerAccount> {
-  if (!existsSync(createdTravelerPath)) {
-    throw new Error(
-      `${createdTravelerPath} not found. Run the traveler signup test (AUTH-003) first: ` +
-      "$env:RUN_SIGNUP_TEST='true'; npm run test:signup",
-    );
-  }
-
-  const account = JSON.parse(await readFile(createdTravelerPath, 'utf8')) as Partial<TravelerAccount>;
-  const { email, password, firstName, lastName } = account;
-  if (!email || !password || !firstName || !lastName) {
-    throw new Error(`${createdTravelerPath} must contain email, password, firstName, and lastName.`);
-  }
-  return { email, password, firstName, lastName };
 }

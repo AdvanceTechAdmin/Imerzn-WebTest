@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { parseCsv } from './common';
+import { parseCsv } from '../common/common';
 
 export const experienceCsvPath = resolve(
   process.cwd(),
@@ -84,10 +84,6 @@ export async function readExperienceData(): Promise<ExperienceData> {
     );
   }
   return data;
-}
-
-export function splitList(value: string): string[] {
-  return value.split('|').map((item) => item.trim()).filter(Boolean);
 }
 
 export function parseBoolean(value: string, column: string): boolean | undefined {

@@ -5,9 +5,9 @@ import { AdminUsersPage } from '../../pages/admin/admin-users-page';
 import { SignupPage } from '../../pages/auth/signup-page';
 import { CreateGuideProfilePage } from '../../pages/localite/create-guide-profile-page';
 import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
-import { createLocaliteSignupData, readAuthData } from '../../utils/auth-data';
-import { autoCloseNewsletterPopup, step } from '../../utils/common';
-import { saveCreatedLocalite } from '../../utils/created-localite';
+import { createLocaliteSignupData, readAuthData } from '../../utils/common/auth-data';
+import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
+import { saveCreatedLocalite } from '../../utils/localite/created-localite';
 
 test('LOC-001 | New localite signs up and is verified by an admin', async ({ page }) => {
   // Run only when explicitly enabled because signup creates a real account.

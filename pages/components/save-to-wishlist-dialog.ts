@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { escapeRegExp } from '../../utils/common';
+import { escapeRegExp } from '../../utils/common/common';
 
 /** "Save to wishlist" dialog opened by the heart icon on an experience card. */
 export class SaveToWishlistDialog {

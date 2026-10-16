@@ -5,9 +5,9 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 // Import the expected data structure for the signup form from its Page Object file.
-import type { SignupFormData } from '../pages/auth/signup-page';
-import type { GuideProfileFormData } from '../pages/localite/create-guide-profile-page';
-import { splitList } from './experience-data';
+import type { SignupFormData } from '../../pages/auth/signup-page';
+import type { GuideProfileFormData } from '../../pages/localite/create-guide-profile-page';
+import { splitList } from './common';
 
 // Build an absolute path to the CSV file containing authentication test data.
 // process.cwd() refers to the current project working directory.

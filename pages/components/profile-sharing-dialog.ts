@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { escapeRegExp } from '../../utils/common';
+import { escapeRegExp } from '../../utils/common/common';
 
 /** "Profile Sharing" dialog opened by Share Profile on the profile and preview pages. */
 export class ProfileSharingDialog {

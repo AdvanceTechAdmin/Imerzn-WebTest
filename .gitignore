@@ -17,6 +17,7 @@ testdata/common/auth.csv
 testdata/localite/created-localite.json
 testdata/localite/created-content.json
 testdata/traveler/created-traveler.json
+testdata/traveler/created-bookings.json
 
 # Logs
 *.log
@@ -40,3 +41,6 @@ Desktop.ini
 
 # Local AI/MCP cache (only if generated locally)
 .playwright-mcp/
+# CI failure page and JSON results (generated)
+public-report/
+results.json
