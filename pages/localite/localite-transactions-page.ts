@@ -10,6 +10,17 @@ export interface LocaliteEarnings {
   localiteEarnings: number;
 }
 
+/** All values in the transaction View dialog. */
+export interface TransactionView extends LocaliteEarnings {
+  travelerName: string;
+  people: number;
+  amount: number;
+  credits: number;
+  subTotal: number;
+  salesTaxAndPlatformFee: number;
+  total: number;
+}
+
 /** Page Object for the localite's Transactions page (/dashboard/transactions). */
 export class LocaliteTransactionsPage {
   constructor(private readonly page: Page) {}
@@ -30,6 +41,56 @@ export class LocaliteTransactionsPage {
   /** Dialog opened by View, with the amount breakdown, commission, and localite earnings. */
   get viewDialog(): Locator {
     return this.page.getByRole('dialog').filter({ hasText: 'Localite Earnings' });
+  }
+
+  /** Booking Ids of all transactions, most recent first. */
+  async bookingIds(): Promise<string[]> {
+    const rows = this.main.getByRole('row').filter({ has: this.page.getByRole('button', { name: 'View', exact: true }) });
+    await expect(rows.first()).toBeVisible({ timeout: 30_000 });
+    return (await rows.locator('td:nth-child(5)').allInnerTexts()).map((id) => id.trim());
+  }
+
+  /** Click View on a booking's transaction and read every value in the dialog (left open). */
+  async openView(bookingId: string): Promise<TransactionView> {
+    await this.transactionRow(bookingId).getByRole('button', { name: 'View', exact: true }).click();
+    const dialog = this.viewDialog;
+    await expect(dialog).toBeVisible();
+
+    const text = (await dialog.innerText()).replace(/\s+/g, ' ');
+    const money = (pattern: RegExp, label: string): number => {
+      const match = text.match(pattern);
+      if (!match) {
+        throw new Error(`Could not find "${label}" in the View dialog: ${text}`);
+      }
+      return Number(match[match.length - 1].replace(/,/g, ''));
+    };
+    return {
+      travelerName: (await dialog.getByRole('heading').first().innerText()).trim(),
+      people: money(/Amount \(x (\d+) (?:people|person)\)/, 'people'),
+      amount: money(/Amount \(x \d+ (?:people|person)\) \$([\d,.]+)/, 'Amount'),
+      // A booking without a promo code may have no Credits row; then the credit is $0.
+      credits: /Credits \$/.test(text) ? money(/Credits \$([\d,.]+)/, 'Credits') : 0,
+      subTotal: money(/Sub Total \$([\d,.]+)/, 'Sub Total'),
+      salesTaxAndPlatformFee: money(/Sales Tax \+ Platform Fee \$([\d,.]+)/, 'Sales Tax + Platform Fee'),
+      // "Total" on its own, not the "Sub Total" row.
+      total: money(/(?<!Sub )Total \$([\d,.]+)/, 'Total'),
+      commissionPercent: money(/Commission \(([\d.]+)%\)/, 'Commission %'),
+      commission: money(/Commission \([\d.]+%\) \$([\d,.]+)/, 'Commission'),
+      localiteEarnings: money(/Localite Earnings[^$]*\$([\d,.]+)/, 'Localite Earnings'),
+    };
+  }
+
+  /** Verify the dialog's sums: Sub Total, Total, Commission = % x Sub Total, Earnings = Sub Total - Commission. */
+  verifyViewTotals(view: TransactionView): void {
+    expect(view.subTotal, 'Sub Total = Amount - Credits').toBe(toCents(view.amount - view.credits));
+    expect(view.total, 'Total = Sub Total + Sales Tax + Platform Fee').toBe(toCents(view.subTotal + view.salesTaxAndPlatformFee));
+    expect(view.commission, 'Commission = % x Sub Total').toBe(toCents((view.commissionPercent / 100) * view.subTotal));
+    expect(view.localiteEarnings, 'Localite Earnings = Sub Total - Commission').toBe(toCents(view.subTotal - view.commission));
+  }
+
+  async closeView(): Promise<void> {
+    await this.viewDialog.locator('button.btn-close').click();
+    await expect(this.viewDialog).toBeHidden();
   }
 
   /** Verify the paid booking's transaction: traveler name, amount, date, and status Paid. */
@@ -55,41 +116,23 @@ export class LocaliteTransactionsPage {
       throw new Error('The paid booking has no recorded price breakdown. Re-run the booking test.');
     }
 
-    await this.transactionRow(bookingId).getByRole('button', { name: 'View', exact: true }).click();
-    const dialog = this.viewDialog;
-    await expect(dialog).toBeVisible();
-    await expect(dialog.getByRole('heading', { name: travelerName, exact: true })).toBeVisible();
-
-    const text = (await dialog.innerText()).replace(/\s+/g, ' ');
-    const money = (pattern: RegExp, label: string): number => {
-      const match = text.match(pattern);
-      if (!match) {
-        throw new Error(`Could not find "${label}" in the View dialog: ${text}`);
-      }
-      return Number(match[match.length - 1].replace(/,/g, ''));
-    };
+    const view = await this.openView(bookingId);
+    await expect(this.viewDialog.getByRole('heading', { name: travelerName, exact: true })).toBeVisible();
 
     // Values entered on the traveler side.
-    expect(money(/Amount \(x (\d+) (?:people|person)\)/, 'people'), 'People').toBe(booking.people);
-    expect(money(/Amount \(x \d+ (?:people|person)\) \$([\d,.]+)/, 'Amount'), 'Amount').toBe(prices.amount);
-    // A booking without a promo code may have no Credits row; then the credit is $0.
-    const credits = /Credits \$/.test(text) ? money(/Credits \$([\d,.]+)/, 'Credits') : 0;
-    expect(credits, 'Credits').toBe(prices.credit);
-    expect(money(/Sub Total \$([\d,.]+)/, 'Sub Total'), 'Sub Total').toBe(prices.subTotal);
-    expect(money(/Sales Tax \+ Platform Fee \$([\d,.]+)/, 'Sales Tax + Platform Fee'), 'Sales Tax + Platform Fee')
-      .toBe(toCents(prices.salesTax + prices.platformFee));
-    // "Total" on its own, not the "Sub Total" row.
-    expect(money(/(?<!Sub )Total \$([\d,.]+)/, 'Total'), 'Total').toBe(prices.totalAmountDue);
+    expect(view.people, 'People').toBe(booking.people);
+    expect(view.amount, 'Amount').toBe(prices.amount);
+    expect(view.credits, 'Credits').toBe(prices.credit);
+    expect(view.subTotal, 'Sub Total').toBe(prices.subTotal);
+    expect(view.salesTaxAndPlatformFee, 'Sales Tax + Platform Fee').toBe(toCents(prices.salesTax + prices.platformFee));
+    expect(view.total, 'Total').toBe(prices.totalAmountDue);
 
     // Commission and earnings.
-    const commissionPercent = money(/Commission \(([\d.]+)%\)/, 'Commission %');
-    const commission = money(/Commission \([\d.]+%\) \$([\d,.]+)/, 'Commission');
-    const localiteEarnings = money(/Localite Earnings[^$]*\$([\d,.]+)/, 'Localite Earnings');
-    expect(commission, 'Commission = % x Sub Total').toBe(toCents((commissionPercent / 100) * prices.subTotal));
-    expect(localiteEarnings, 'Localite Earnings = Sub Total - Commission').toBe(toCents(prices.subTotal - commission));
+    expect(view.commission, 'Commission = % x Sub Total').toBe(toCents((view.commissionPercent / 100) * prices.subTotal));
+    expect(view.localiteEarnings, 'Localite Earnings = Sub Total - Commission').toBe(toCents(prices.subTotal - view.commission));
 
-    await dialog.locator('button.btn-close').click();
-    await expect(dialog).toBeHidden();
+    await this.closeView();
+    const { commissionPercent, commission, localiteEarnings } = view;
     return { commissionPercent, commission, localiteEarnings };
   }
 }

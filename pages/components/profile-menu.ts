@@ -17,6 +17,11 @@ export class ProfileMenu {
     return this.page.getByRole('banner').getByRole('link', { name: 'Dashboard', exact: true });
   }
 
+  /** "Referral" in the localite's profile menu. */
+  get referralLink(): Locator {
+    return this.page.getByRole('banner').getByRole('link', { name: 'Referral', exact: true });
+  }
+
   get settingsLink(): Locator {
     return this.page.getByRole('banner').getByRole('link', { name: 'Settings', exact: true });
   }
@@ -92,6 +97,13 @@ export class ProfileMenu {
     await expect(this.logOutConfirmQuestion).toBeVisible();
     await this.logOutConfirmButton.click();
     await expect(this.loggedOutIndicator.first()).toBeVisible({ timeout: 30_000 });
+  }
+
+  /** Open the profile menu and go to Referral (localites). */
+  async openReferral(): Promise<void> {
+    await this.profileImage.click();
+    await this.referralLink.click();
+    await expect(this.page).toHaveURL(/\/guide_referral_page\//);
   }
 
   /** Open the profile menu and go to Wishlist. */

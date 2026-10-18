@@ -13,6 +13,8 @@ jobs:
     permissions:
       # Push the published report to the gh-pages branch.
       contents: write
+      # Check whether GitHub Pages is enabled before linking to the published page.
+      pages: read
 
     steps:
       - name: Checkout repository
@@ -82,7 +84,15 @@ jobs:
           node scripts/failure-report.mjs results.json public-report
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           REPO="${{ github.event.repository.name }}"
-          echo "url=https://$OWNER.github.io/$REPO/reports/${{ github.run_id }}/" >> "$GITHUB_OUTPUT"
+          # Link to the page only if GitHub Pages is enabled for the repo (Settings > Pages, branch
+          # gh-pages); otherwise Slack falls back to the run link. The page is published either way.
+          PAGES_STATUS=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pages")
+          if [ "$PAGES_STATUS" = "200" ]; then
+            echo "url=https://$OWNER.github.io/$REPO/reports/${{ github.run_id }}/" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::GitHub Pages is not enabled (HTTP $PAGES_STATUS); Slack will link to the run instead."
+          fi
 
       - name: Publish report to GitHub Pages
         id: pages

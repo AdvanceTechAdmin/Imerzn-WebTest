@@ -7,6 +7,10 @@ export interface SignupFormData {
   email: string;
   phone: string;
   password: string;
+  /** Optional "Referral Code (optional)" value; left empty when not set. */
+  referralCode?: string;
+  /** "How did you hear about us?" option; defaults to "Google search". */
+  signupSource?: string;
 }
 
 /** Possible states of the signup page. */
@@ -164,10 +168,14 @@ export class SignupPage {
     await this.page.locator('input[name="password"]').fill(data.password);
     await this.page.locator('input[name="cpassword"]').fill(data.password);
 
+    if (data.referralCode) {
+      await this.page.locator('input[name="referral_code"]').fill(data.referralCode);
+    }
+
     // Select the signup referral source.
     await this.page
       .getByLabel(/how did you hear about us/i)
-      .selectOption({ label: 'Google search' });
+      .selectOption({ label: data.signupSource ?? 'Google search' });
   }
 
   /** Accept the required consent and submit the signup form. */

@@ -27,6 +27,7 @@
     "test:localite-bookings": "playwright test tests/localite/localite-dashboard-after-bookings.spec.ts",
     "test:my-bookings-dashboard": "playwright test tests/traveler/traveler-dashboard-after-bookings.spec.ts",
     "test:cancel-booking": "playwright test tests/traveler/cancel-booking.spec.ts",
+    "test:referral-program": "playwright test tests/localite/referral-program.spec.ts",
     "test:localite-cancel-booking": "playwright test tests/localite/localite-cancel-booking.spec.ts",
     "test:localite-flow": "playwright test tests/auth/localite-signup-and-verify.spec.ts && playwright test tests/localite/create-a-publish-experience.spec.ts && playwright test tests/localite/create-gallery.spec.ts && playwright test tests/localite/preview-profile.spec.ts",
     "report": "playwright show-report",

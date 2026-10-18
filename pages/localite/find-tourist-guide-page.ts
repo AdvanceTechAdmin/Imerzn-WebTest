@@ -97,8 +97,11 @@ get experiencesLink(): Locator {
 
   /** Open the Experiences page from the navigation menu. */
   async openExperiences(): Promise<void> {
-    await this.experiencesLink.click();
-    await expect(this.page).toHaveURL(/\/find-tourist-guide/);
+    // Right after login the page may still be loading and a click can be lost: retry until it opens.
+    await expect(async () => {
+      await this.experiencesLink.click({ timeout: 5_000 });
+      await expect(this.page).toHaveURL(/\/find-tourist-guide/, { timeout: 5_000 });
+    }).toPass({ timeout: 45_000 });
   }
 
   /** Search using the created experience title. */

@@ -60,11 +60,24 @@ export class BookExperienceDialog {
     await expect(this.dateInput).toHaveValue(`${expected[0]}-${expected[1]}-${date.getFullYear()}`);
   }
 
-  /** Pick the first available start time and return its label. */
+  /** Start times that can be chosen: not the "--Select--" placeholder, and not disabled (e.g. already passed today). */
+  private get availableStartTimes(): Locator {
+    return this.startTimeSelect.locator('option:not([disabled]):not([value=""])');
+  }
+
+  /** True when the chosen date has at least one start time that can still be booked. */
+  async hasStartTimes(timeoutMs = 5_000): Promise<boolean> {
+    // Wait for the list to load (it holds only its placeholder until then).
+    await expect(this.startTimeSelect.locator('option')).not.toHaveCount(1, { timeout: timeoutMs }).catch(() => {});
+    return (await this.availableStartTimes.count()) > 0;
+  }
+
+  /** Pick the first start time that can be booked and return its label. */
   async selectFirstStartTime(): Promise<string> {
-    await expect(this.startTimeSelect.locator('option')).not.toHaveCount(1);
-    await this.startTimeSelect.selectOption({ index: 1 });
-    return (await this.startTimeSelect.locator('option:checked').textContent())?.trim() ?? '';
+    await expect(this.availableStartTimes.first()).toBeAttached();
+    const label = (await this.availableStartTimes.first().textContent())?.trim() ?? '';
+    await this.startTimeSelect.selectOption({ label });
+    return label;
   }
 
   async fillGroupSizeAndNote(groupSize: number, note: string): Promise<void> {

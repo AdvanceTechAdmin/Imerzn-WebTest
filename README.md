@@ -56,6 +56,7 @@ With `--workers=1`, all other tests run first (in file order), then the booking 
 | | Share profile (PRF-003) | `test:share-profile` |
 | | Localite view of the bookings: transactions, earnings, dashboard (LBK-001) | `test:localite-bookings` |
 | | Localite cancels an Ongoing and a Pending booking; traveler sees them cancelled (LCN-001) | `test:localite-cancel-booking` |
+| | Referral program: referee completes a booking, referrer earns Referral % of the commission and withdraws it, then the traveler books and pays the next booking (REF-001, local only) | `test:referral-program` |
 | `traveler/` | Dashboard empty states for a new traveler (DSH-001) | `test:dashboard` |
 | | Book and pay for an experience with a promo code (BKG-001) | `test:booking` |
 | | Traveler cancels an Ongoing and a Pending booking; localite sees them cancelled (CNL-001) | `test:cancel-booking` |
