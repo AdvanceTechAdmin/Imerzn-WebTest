@@ -16,8 +16,67 @@
 </head>
 <body>
 <h1>Playwright test failures</h1>
-<p>Passed: 22 | Failed: 0 | Flaky: 0 | Skipped: 1</p>
+<p>Passed: 20 | Failed: 2 | Flaky: 0 | Skipped: 1</p>
 <p class="meta">Screenshots and errors only (passwords masked). The full report with traces is in the run's playwright-report artifact.</p>
-<p>All tests passed. No failures to show.</p>
+
+  <section>
+    <h2>SET-002 | Localite edits phone and Bio and changes password</h2>
+    <p class="meta">localite/localite-settings.spec.ts · chromium</p>
+    <pre>Error: Step &quot;Sign in as localite&quot; failed: locator.waitFor: Timeout 15000ms exceeded.
+Call log:
+  - waiting for getByPlaceholder(&#39;you@company.com&#39;) to be visible
+
+
+   at ../utils/common/common.ts:193
+
+  191 |       const message = error instanceof Error ? error.message : String(error);
+  192 |       console.error(`[FAILED] ${title}: ${message}`);
+&gt; 193 |       throw new Error(`Step &quot;${title}&quot; failed: ${message}`, { cause: error });
+      |             ^
+  194 |     }
+  195 |   });
+  196 | }
+    at /home/runner/work/Imerzn-WebTest/Imerzn-WebTest/utils/common/common.ts:193:13
+    at /home/runner/work/Imerzn-WebTest/Imerzn-WebTest/tests/localite/localite-settings.spec.ts:42:3
+[cause]: TimeoutError: locator.waitFor: Timeout 15000ms exceeded.
+Call log:
+  - waiting for getByPlaceholder(&#39;you@company.com&#39;) to be visible
+
+    at LoginPage.open (/home/runner/work/Imerzn-WebTest/Imerzn-WebTest/pages/auth/login-page.ts:18:8)
+    at /home/runner/work/Imerzn-WebTest/Imerzn-WebTest/tests/localite/localite-settings.spec.ts:43:5
+    at /home/runner/work/Imerzn-WebTest/Imerzn-WebTest/utils/common/common.ts:189:14
+    at /home/runner/work/Imerzn-WebTest/Imerzn-WebTest/tests/localite/localite-settings.spec.ts:42:3</pre>
+    <a href="img/1-1.png"><img src="img/1-1.png" alt="Screenshot of SET-002 | Localite edits phone and Bio and changes password"></a>
+  </section>
+
+  <section>
+    <h2>PRF-001 | Localite previews profile, follows, shares, and goes back</h2>
+    <p class="meta">localite/preview-profile.spec.ts · chromium</p>
+    <pre>Error: Step &quot;Sign in as localite&quot; failed: locator.waitFor: Timeout 15000ms exceeded.
+Call log:
+  - waiting for getByPlaceholder(&#39;you@company.com&#39;) to be visible
+
+
+   at ../utils/common/common.ts:193
+
+  191 |       const message = error instanceof Error ? error.message : String(error);
+  192 |       console.error(`[FAILED] ${title}: ${message}`);
+&gt; 193 |       throw new Error(`Step &quot;${title}&quot; failed: ${message}`, { cause: error });
+      |             ^
+  194 |     }
+  195 |   });
+  196 | }
+    at /home/runner/work/Imerzn-WebTest/Imerzn-WebTest/utils/common/common.ts:193:13
+    at /home/runner/work/Imerzn-WebTest/Imerzn-WebTest/tests/localite/preview-profile.spec.ts:33:3
+[cause]: TimeoutError: locator.waitFor: Timeout 15000ms exceeded.
+Call log:
+  - waiting for getByPlaceholder(&#39;you@company.com&#39;) to be visible
+
+    at LoginPage.open (/home/runner/work/Imerzn-WebTest/Imerzn-WebTest/pages/auth/login-page.ts:18:8)
+    at /home/runner/work/Imerzn-WebTest/Imerzn-WebTest/tests/localite/preview-profile.spec.ts:34:5
+    at /home/runner/work/Imerzn-WebTest/Imerzn-WebTest/utils/common/common.ts:189:14
+    at /home/runner/work/Imerzn-WebTest/Imerzn-WebTest/tests/localite/preview-profile.spec.ts:33:3</pre>
+    <a href="img/2-1.png"><img src="img/2-1.png" alt="Screenshot of PRF-001 | Localite previews profile, follows, shares, and goes back"></a>
+  </section>
 </body>
 </html>
