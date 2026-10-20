@@ -116,11 +116,21 @@ export class MyBookingsPage {
     await expect(this.cancelDialog).toBeHidden();
   }
 
-  /** Enter a reason and confirm with the red cancel button. */
+  /**
+   * Enter a reason and confirm with the red cancel button.
+   * Site bug: the booking is sometimes cancelled but the dialog stays open with a spinner.
+   * Then the page is reloaded; the caller's status check confirms the cancel really happened.
+   */
   async confirmCancel(reason: string): Promise<void> {
     await this.cancelDialog.locator('textarea[name="description"]').fill(reason);
     await this.cancelDialog.locator('button', { hasText: this.cancelLabel }).click();
-    await expect(this.cancelDialog).toBeHidden({ timeout: 30_000 });
+    // Wait for the dialog to close; if it is stuck open, reload instead of failing here.
+    const closed = await expect(this.cancelDialog).toBeHidden({ timeout: 20_000 }).then(() => true, () => false);
+    if (!closed) {
+      console.log('Cancel dialog stayed open after confirming; reloading the page (site bug).');
+      await this.page.reload({ waitUntil: 'domcontentloaded' });
+      await expect(this.cancelDialog).toBeHidden();
+    }
   }
 
   async closeDetails(): Promise<void> {

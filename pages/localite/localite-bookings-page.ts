@@ -46,6 +46,17 @@ export class LocaliteBookingsPage extends MyBookingsPage {
     return (await rows.locator('td:nth-child(1)').allInnerTexts()).map((id) => id.trim());
   }
 
+  /**
+   * Booking Ids of the listed rows that show "Complete booking".
+   * The site shows that button only once the booking's start time has passed,
+   * so an Ongoing booking later today cannot be completed yet.
+   */
+  async completableBookingIds(): Promise<string[]> {
+    const rows = this.page.getByRole('main').getByRole('row')
+      .filter({ has: this.page.getByRole('button', { name: 'Complete booking', exact: true }) });
+    return (await rows.locator('td:nth-child(1)').allInnerTexts()).map((id) => id.trim());
+  }
+
   /** Message shown after a booking is completed. */
   get bookingCompletedMessage(): Locator {
     return this.page.getByText('Booking Completed', { exact: false }).first();

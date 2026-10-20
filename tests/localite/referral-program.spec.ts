@@ -68,8 +68,9 @@ test('REF-001 | Referral program: referrer earns Referral % of the commission an
     report('Referral History before', before);
   });
 
-  // Step 2: Referee opens View on the most recent transaction whose booking is still Ongoing
-  // (earlier runs completed others), and records Commission and Localite Earnings.
+  // Step 2: Referee opens View on the most recent transaction whose booking is still Ongoing and
+  // already shows "Complete booking" (earlier runs completed others; a booking later today cannot
+  // be completed yet), and records Commission and Localite Earnings.
   let bookingId = '';
   let view: TransactionView | undefined;
   await step('Referee: check a transaction in My Transactions', async () => {
@@ -80,15 +81,18 @@ test('REF-001 | Referral program: referrer earns Referral % of the commission an
     await dashboardPage.sectionLink('My Bookings').click();
     await bookingsPage.filterByStatus('Ongoing');
     const ongoingIds = await bookingsPage.listedBookingIds();
+    // Only bookings whose start time has passed show "Complete booking".
+    const completableIds = await bookingsPage.completableBookingIds();
 
     await dashboardPage.sectionLink('Transactions').click();
     await expect(page).toHaveURL(/\/dashboard\/transactions/);
     const paidIds = await transactionsPage.bookingIds();
-    const found = paidIds.find((id) => ongoingIds.includes(id));
+    const found = paidIds.find((id) => completableIds.includes(id));
     if (!found) {
-      throw new Error(`No paid booking is still Ongoing (Ongoing: ${ongoingIds.join(', ') || 'none'}). ` +
-        `The last steps of this test book and pay for "${referral.experience.title}" as ${travelerName}; ` +
-        'if the previous run stopped before them, book and pay once by hand.');
+      throw new Error(`No paid Ongoing booking can be completed yet (Ongoing: ${ongoingIds.join(', ') || 'none'}; ` +
+        `with Complete booking: ${completableIds.join(', ') || 'none'}). "Complete booking" appears only after the ` +
+        `booking's start time. The last steps of this test book and pay for "${referral.experience.title}" as ` +
+        `${travelerName}; wait until that booking starts, or book and pay an earlier slot once by hand.`);
     }
     bookingId = found;
     view = await transactionsPage.openView(bookingId);
