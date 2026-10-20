@@ -1,17 +1,16 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../../pages/auth/login-page';
-import { ProfileMenu } from '../../pages/components/profile-menu';
-import { SettingsPage } from '../../pages/common/settings-page';
-import { readAuthData } from '../../utils/common/auth-data';
-import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
-import { getTravelerAccount, saveCreatedTraveler } from '../../utils/traveler/created-traveler';
-import { readTravelerSettingsData } from '../../utils/traveler/traveler-settings-data';
+import { readAuthData } from '@data/common/auth-data';
+import { saveCreatedTraveler } from '@data/state/created-traveler';
+import { readTravelerSettingsData } from '@data/traveler/traveler-settings-data';
+import { expect, test } from '@fixtures/test';
+import { forgetSession } from '@fixtures/session';
+import { step } from '@helpers/step';
 
-test('SET-001 | Traveler edits account details and changes password', async ({ page }) => {
+test('SET-001 | Traveler edits account details and changes password', { tag: ['@traveler'] }, async ({
+  session, traveler, loginPage, profileMenu, settingsPage,
+}) => {
   test.setTimeout(150_000);
 
-  // Pre-setup: Traveler saved by AUTH-003, new details, and the new password.
-  const traveler = await getTravelerAccount();
+  // Pre-setup: new details from traveler-settings.csv, and the new password.
   const data = await readTravelerSettingsData();
   const authData = await readAuthData();
   // If a previous run already set Traveler New Password, switch back to Signup Password
@@ -21,16 +20,9 @@ test('SET-001 | Traveler edits account details and changes password', async ({ p
     : authData.travelerNewPassword;
   test.info().annotations.push({ type: 'Traveler email', description: traveler.email });
 
-  const loginPage = new LoginPage(page);
-  const profileMenu = new ProfileMenu(page);
-  const settingsPage = new SettingsPage(page);
-
-  await autoCloseNewsletterPopup(page);
-
   // Step 1: Sign in as the traveler.
   await step('Sign in as traveler', async () => {
-    await loginPage.open();
-    await loginPage.login(traveler.email, traveler.password);
+    await session.signIn(traveler);
     await expect(profileMenu.profileImage).toBeVisible({ timeout: 60_000 });
   });
 
@@ -55,20 +47,22 @@ test('SET-001 | Traveler edits account details and changes password', async ({ p
     await settingsPage.changePassword(traveler.password, newPassword);
   });
 
-  // Save the new password right away so later runs and tests can still log in.
+  // Save the new password right away so later runs and tests can still log in, and drop the
+  // saved session: it belongs to the old password.
   await saveCreatedTraveler({
     ...traveler,
     firstName: data.firstName,
     lastName: data.lastName,
     password: newPassword,
   });
+  await forgetSession(traveler.email);
 
   // Step 5: Log out.
   await step('Log out', async () => {
-    await profileMenu.logOut();
+    await session.signOut();
   });
 
-  // Step 6: Log in with the new password and verify it succeeds.
+  // Step 6: Log in with the new password through the login form (this is what the test checks).
   await step('Log in with the new password', async () => {
     await loginPage.open();
     await loginPage.login(traveler.email, newPassword);

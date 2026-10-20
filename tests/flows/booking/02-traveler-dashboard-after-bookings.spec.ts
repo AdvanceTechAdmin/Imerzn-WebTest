@@ -1,17 +1,14 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../../pages/auth/login-page';
-import { ProfileMenu } from '../../pages/components/profile-menu';
-import { DashboardPage } from '../../pages/traveler/dashboard-page';
-import { MyBookingsPage } from '../../pages/traveler/my-bookings-page';
-import { TransactionsPage } from '../../pages/traveler/transactions-page';
-import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
-import { getTravelerAccount, readCreatedBookings } from '../../utils/traveler/created-traveler';
+import { readCreatedBookings } from '@data/state/created-traveler';
+import { expect, test } from '@fixtures/test';
+import { step } from '@helpers/step';
 
-test('DSH-002 | Dashboard, My Bookings, and Transactions show the paid and pending bookings', async ({ page }) => {
+/* Booking flow step 2 of 5: the traveler's dashboard shows the bookings made in step 1. */
+test('DSH-002 | Dashboard, My Bookings, and Transactions show the paid and pending bookings', { tag: ['@booking', '@traveler'] }, async ({
+  page, session, traveler, profileMenu, dashboardPage, myBookingsPage, transactionsPage,
+}) => {
   test.setTimeout(240_000);
 
-  // Pre-setup: traveler from AUTH-003 and the bookings made by the booking test (BKG-001).
-  const traveler = await getTravelerAccount();
+  // Pre-setup: the bookings made by the booking test (BKG-001).
   const { paid, pending } = await readCreatedBookings(traveler.email);
   const totalBookings = paid.length + pending.length;
   test.info().annotations.push(
@@ -20,18 +17,9 @@ test('DSH-002 | Dashboard, My Bookings, and Transactions show the paid and pendi
     ...pending.map((b) => ({ type: 'Pending booking', description: `${b.date} ${b.startTime}, ${b.people} people` })),
   );
 
-  const loginPage = new LoginPage(page);
-  const profileMenu = new ProfileMenu(page);
-  const dashboardPage = new DashboardPage(page);
-  const myBookingsPage = new MyBookingsPage(page);
-  const transactionsPage = new TransactionsPage(page);
-
-  await autoCloseNewsletterPopup(page);
-
   // Step 1: Sign in as the traveler.
   await step('Sign in as traveler', async () => {
-    await loginPage.open();
-    await loginPage.login(traveler.email, traveler.password);
+    await session.signIn(traveler);
     await expect(profileMenu.dashboardLink).toBeVisible({ timeout: 60_000 });
   });
 

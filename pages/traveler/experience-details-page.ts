@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { escapeRegExp } from '../../utils/common/common';
+import { escapeRegExp } from '@helpers/text';
 
 /** Page Object for an experience details page (/find-tourist-guide/details/...). */
 export class ExperienceDetailsPage {

@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test';
+import { MaintenancePage, SITE_OFFLINE_MESSAGE } from '../components/maintenance-page';
 
 export class LoginPage {
   // Store the browser page so all login actions use the same page.
@@ -7,15 +8,21 @@ export class LoginPage {
   /**
    * Open the login page using the baseURL configured in playwright.config.ts.
    * Wait until the email field is visible before continuing.
+   * Fails with a clear message if the site shows its maintenance page instead.
    */
   async open(): Promise<void> {
     // Wait for the page structure only: third-party scripts can delay the full "load" event,
     // and the email field check below confirms the form is ready.
     await this.page.goto('/login', { waitUntil: 'domcontentloaded' });
 
-    await this.page
-      .getByPlaceholder('you@company.com')
-      .waitFor({ state: 'visible' });
+    // Wait for the login form or the maintenance page, whichever appears first.
+    // 30s: the first (cold) load of the day can take 8s or more.
+    const emailField = this.page.getByPlaceholder('you@company.com');
+    const maintenance = new MaintenancePage(this.page);
+    await emailField.or(maintenance.message).first().waitFor({ state: 'visible', timeout: 30_000 });
+    if (await maintenance.isShown()) {
+      throw new Error(SITE_OFFLINE_MESSAGE);
+    }
   }
 
   /**

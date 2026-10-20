@@ -8,7 +8,26 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "types": ["node", "@playwright/test"],
-    "noEmit": true
+    "noEmit": true,
+
+    // Short import paths, e.g. '@pages/auth/login-page' instead of '../../pages/auth/login-page'.
+    // Playwright reads these same aliases when it runs the tests.
+    "baseUrl": ".",
+    "paths": {
+      "@config/*": ["config/*"],
+      "@data/*": ["data/*"],
+      "@fixtures/*": ["fixtures/*"],
+      "@helpers/*": ["helpers/*"],
+      "@pages/*": ["pages/*"]
+    }
   },
-  "include": ["playwright.config.ts", "tests/**/*.ts", "pages/**/*.ts", "utils/**/*.ts", "src/**/*.ts"]
+  "include": [
+    "playwright.config.ts",
+    "config/**/*.ts",
+    "data/**/*.ts",
+    "fixtures/**/*.ts",
+    "helpers/**/*.ts",
+    "pages/**/*.ts",
+    "tests/**/*.ts"
+  ]
 }

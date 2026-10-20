@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import { toCents } from '../components/price-breakdown';
-import type { CreatedBooking } from '../../utils/traveler/created-traveler';
+import type { CreatedBooking } from '@data/state/created-traveler';
 import { toMoney } from '../traveler/my-bookings-page';
 
 /** Values in the localite's transaction View dialog. */

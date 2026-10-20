@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import type { EditProfileData } from '../../utils/localite/edit-profile-data';
+import type { EditProfileData } from '@data/localite/edit-profile-data';
 import { ExperiencesMultiSelect } from '../components/experiences-multi-select';
 
 /** Page Object for a localite's Edit Profile page (/edit-profile/<slug>). */

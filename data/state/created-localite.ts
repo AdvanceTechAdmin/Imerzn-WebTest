@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { readAuthData } from '../common/auth-data';
+import { readAuthData } from '@data/common/auth-data';
 
 // Local-only file that hands the localite created by LOC-001 to later tests.
 const createdLocalitePath = resolve(process.cwd(), 'testdata', 'localite', 'created-localite.json');

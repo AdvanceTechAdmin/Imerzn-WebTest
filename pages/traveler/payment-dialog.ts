@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import type { BookingData } from '../../utils/traveler/booking-data';
+import type { BookingData } from '@data/traveler/booking-data';
 import { readPriceBreakdown, type PriceBreakdown } from '../components/price-breakdown';
 
 /** "Payment" dialog shown after Book; card fields are Stripe secure iframes. */

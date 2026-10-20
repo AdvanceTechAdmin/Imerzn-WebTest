@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { selectLocationSuggestion } from '../../utils/common/common';
-import type { StoryFormData } from '../../utils/traveler/story-data';
+import { selectLocationSuggestion } from '../components/location-picker';
+import type { StoryFormData } from '@data/traveler/story-data';
 
 /**
  * Page Object for traveler stories: the header Stories menu, My Stories (/my-stories),

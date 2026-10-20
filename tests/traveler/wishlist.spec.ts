@@ -1,34 +1,22 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../../pages/auth/login-page';
-import { ProfileMenu } from '../../pages/components/profile-menu';
-import { FindTouristGuidePage } from '../../pages/localite/find-tourist-guide-page';
-import { WishlistPage } from '../../pages/traveler/wishlist-page';
-import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
-import { getTravelerAccount } from '../../utils/traveler/created-traveler';
-import { readWishlistName } from '../../utils/traveler/wishlist-data';
+import { readWishlistName } from '@data/traveler/wishlist-data';
+import { expect, test } from '@fixtures/test';
+import { step } from '@helpers/step';
 
-test('WSH-001 | Traveler creates a wishlist and saves an experience to it', async ({ page }) => {
+test('WSH-001 | Traveler creates a wishlist and saves an experience to it', { tag: ['@traveler'] }, async ({
+  session, traveler, profileMenu, wishlistPage, experiencesPage,
+}) => {
   test.setTimeout(120_000);
 
-  // Pre-setup: Traveler saved by AUTH-003 and a unique wishlist name.
-  const traveler = await getTravelerAccount();
+  // Pre-setup: a unique wishlist name from wishlist.csv.
   const wishlistName = await readWishlistName();
   test.info().annotations.push(
     { type: 'Traveler email', description: traveler.email },
     { type: 'Wishlist name', description: wishlistName },
   );
 
-  const loginPage = new LoginPage(page);
-  const profileMenu = new ProfileMenu(page);
-  const wishlistPage = new WishlistPage(page);
-  const experiencesPage = new FindTouristGuidePage(page);
-
-  await autoCloseNewsletterPopup(page);
-
   // Step 1: Sign in as the traveler.
   await step('Sign in as traveler', async () => {
-    await loginPage.open();
-    await loginPage.login(traveler.email, traveler.password);
+    await session.signIn(traveler);
     await expect(profileMenu.profileImage).toBeVisible({ timeout: 60_000 });
   });
 

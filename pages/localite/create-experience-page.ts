@@ -10,9 +10,9 @@ import {
 import {
   parseBoolean,
   type ExperienceData,
-} from '../../utils/localite/experience-data';
-import { splitList } from '../../utils/common/common';
-import { selectLocationSuggestion } from '../../utils/common/common';
+} from '@data/localite/experience-data';
+import { splitList } from '@helpers/text';
+import { selectLocationSuggestion } from '../components/location-picker';
 
 /**
  * Page Object for creating and publishing an experience.

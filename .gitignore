@@ -44,3 +44,6 @@ Desktop.ini
 # CI failure page and JSON results (generated)
 public-report/
 results.json
+
+# Saved logins reused by fixtures/session.ts (they hold login tokens)
+.auth/

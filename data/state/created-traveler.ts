@@ -22,7 +22,7 @@ export async function getTravelerAccount(): Promise<TravelerAccount> {
   if (!existsSync(createdTravelerPath)) {
     throw new Error(
       `${createdTravelerPath} not found. Run the traveler signup test (AUTH-003) first: ` +
-      "$env:RUN_SIGNUP_TEST='true'; npm run test:signup",
+      "$env:RUN_SIGNUP_TEST='true'; npm run test:setup",
     );
   }
 
@@ -111,7 +111,7 @@ export async function readCreatedBookings(
   if (!data || data.travelerEmail !== travelerEmail || data.paid.length === 0 || data.pending.length === 0) {
     throw new Error(
       `No paid and pending bookings recorded for ${travelerEmail} in ${createdBookingsPath}. ` +
-      'Run the booking test (experience-booking.spec.ts) first.',
+      'Run the booking test (tests/flows/booking/01-experience-booking.spec.ts) first.',
     );
   }
   return { paid: data.paid, pending: data.pending };

@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { escapeRegExp } from '../../utils/common/common';
+import { escapeRegExp } from '@helpers/text';
 import { ProfileSharingDialog } from '../components/profile-sharing-dialog';
 
 /** Page Object for a localite's Preview Profile page (/preview-profile/<slug>). */

@@ -1,16 +1,13 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../../pages/auth/login-page';
-import { ProfileMenu } from '../../pages/components/profile-menu';
-import { StoriesPage } from '../../pages/traveler/stories-page';
-import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
-import { getTravelerAccount } from '../../utils/traveler/created-traveler';
-import { readStoryData } from '../../utils/traveler/story-data';
+import { readStoryData } from '@data/traveler/story-data';
+import { expect, test } from '@fixtures/test';
+import { step } from '@helpers/step';
 
-test('STR-001 | Traveler creates, edits, and publishes a story', async ({ page }) => {
+test('STR-001 | Traveler creates, edits, and publishes a story', { tag: ['@traveler'] }, async ({
+  session, traveler, profileMenu, storiesPage,
+}) => {
   test.setTimeout(150_000);
 
-  // Pre-setup: Traveler from AUTH-003 and story data from testdata/traveler/story.csv.
-  const traveler = await getTravelerAccount();
+  // Pre-setup: story data from testdata/traveler/story.csv (unique titles per run).
   const story = await readStoryData();
   test.info().annotations.push(
     { type: 'Traveler email', description: traveler.email },
@@ -18,16 +15,9 @@ test('STR-001 | Traveler creates, edits, and publishes a story', async ({ page }
     { type: 'Updated story title', description: story.updated.title },
   );
 
-  const loginPage = new LoginPage(page);
-  const profileMenu = new ProfileMenu(page);
-  const storiesPage = new StoriesPage(page);
-
-  await autoCloseNewsletterPopup(page);
-
   // Step 1: Sign in as the traveler.
   await step('Sign in as traveler', async () => {
-    await loginPage.open();
-    await loginPage.login(traveler.email, traveler.password);
+    await session.signIn(traveler);
     await expect(profileMenu.profileImage).toBeVisible({ timeout: 60_000 });
   });
 

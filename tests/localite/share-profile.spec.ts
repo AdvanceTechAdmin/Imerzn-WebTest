@@ -1,43 +1,34 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../../pages/auth/login-page';
-import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
-import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
-import { getLocaliteAccount } from '../../utils/localite/created-localite';
+import { expect, test } from '@fixtures/test';
+import { step } from '@helpers/step';
 
-test('PRF-003 | Localite opens and closes Profile Sharing from the profile', async ({ page }) => {
+test('PRF-003 | Localite opens and closes Profile Sharing from the profile', { tag: ['@localite'] }, async ({
+  page, session, localite, guideProfilePage,
+}) => {
   test.setTimeout(90_000);
 
-  // Pre-setup: Localite account (name and bio include any Edit Profile changes).
-  const localite = await getLocaliteAccount();
+  // Pre-setup: the localite fixture's name and bio include any Edit Profile / Settings changes.
   test.info().annotations.push({ type: 'Localite email', description: localite.email });
 
-  const loginPage = new LoginPage(page);
-  const profilePage = new GuideProfilePage(page);
-
-  await autoCloseNewsletterPopup(page);
-
-  // Step 1: Sign in as the localite.
+  // Step 1: Sign in as the localite (lands on the localite's profile page).
   await step('Sign in as localite', async () => {
-    await loginPage.open();
-    await loginPage.login(localite.email, localite.password);
-
+    await session.signIn(localite);
     await expect(page).toHaveURL(/guide_detailed_page/, { timeout: 60_000 });
-    await expect(profilePage.dashboardLink).toBeVisible();
+    await expect(guideProfilePage.dashboardLink).toBeVisible();
   });
 
   const profileUrl = page.url();
 
-  // Step 2: Open Share Profile and verify the dialog shows the bio.
+  // Step 2: Open Share Profile and verify the dialog shows the name and bio.
   await step('Open Profile Sharing', async () => {
-    await profilePage.shareProfileButton.click();
-    await profilePage.shareDialog.verifyDetails(localite.firstName, localite.lastName, localite.bio);
+    await guideProfilePage.shareProfileButton.click();
+    await guideProfilePage.shareDialog.verifyDetails(localite.firstName, localite.lastName, localite.bio);
   });
 
   // Step 3: Close the dialog and verify the app is back on the profile.
   await step('Close Profile Sharing', async () => {
-    await profilePage.shareDialog.close();
+    await guideProfilePage.shareDialog.close();
 
     await expect(page).toHaveURL(profileUrl);
-    await expect(profilePage.shareProfileButton).toBeVisible();
+    await expect(guideProfilePage.shareProfileButton).toBeVisible();
   });
 });

@@ -1,25 +1,21 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../../pages/auth/login-page';
-import { ProfileMenu } from '../../pages/components/profile-menu';
-import { toCents } from '../../pages/components/price-breakdown';
-import { LocaliteBookingsPage } from '../../pages/localite/localite-bookings-page';
-import { LocaliteTransactionsPage } from '../../pages/localite/localite-transactions-page';
-import { DashboardPage } from '../../pages/traveler/dashboard-page';
-import { toMoney } from '../../pages/traveler/my-bookings-page';
-import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
-import { getLocaliteAccount } from '../../utils/localite/created-localite';
-import { getTravelerAccount, readCreatedBookings } from '../../utils/traveler/created-traveler';
+import { readCreatedBookings } from '@data/state/created-traveler';
+import { expect, test } from '@fixtures/test';
+import { step } from '@helpers/step';
+import { toCents } from '@pages/components/price-breakdown';
+import { toMoney } from '@pages/traveler/my-bookings-page';
 
 /*
- * Localite view of the traveler's bookings. Needs the bookings made by
- * tests/traveler/experience-booking.spec.ts, so it must run after that test.
+ * Booking flow step 3 of 5: the localite's view of the traveler's bookings made in step 1
+ * (tests/flows/booking/01-experience-booking.spec.ts).
  */
-test('LBK-001 | Localite sees the traveler bookings, transactions, earnings, and dashboard totals', async ({ page }) => {
+test('LBK-001 | Localite sees the traveler bookings, transactions, earnings, and dashboard totals', { tag: ['@booking', '@localite'] }, async ({
+  page, session, localite, traveler, profileMenu, dashboardPage,
+  localiteBookingsPage: bookingsPage,
+  localiteTransactionsPage: transactionsPage,
+}) => {
   test.setTimeout(240_000);
 
-  // Pre-setup: localite who owns the experience, and the bookings the traveler made (BKG-001).
-  const localite = await getLocaliteAccount();
-  const traveler = await getTravelerAccount();
+  // Pre-setup: the bookings the traveler made (BKG-001) for the localite's experience.
   const { paid, pending } = await readCreatedBookings(traveler.email);
   const totalBookings = paid.length + pending.length;
   // Name the traveler entered in the booking form (shown to the localite).
@@ -29,18 +25,9 @@ test('LBK-001 | Localite sees the traveler bookings, transactions, earnings, and
     { type: 'Traveler', description: `${travelerName} (${traveler.email})` },
   );
 
-  const loginPage = new LoginPage(page);
-  const profileMenu = new ProfileMenu(page);
-  const dashboardPage = new DashboardPage(page);
-  const bookingsPage = new LocaliteBookingsPage(page);
-  const transactionsPage = new LocaliteTransactionsPage(page);
-
-  await autoCloseNewsletterPopup(page);
-
   // Step 1: Sign in as the localite.
   await step('Sign in as localite', async () => {
-    await loginPage.open();
-    await loginPage.login(localite.email, localite.password);
+    await session.signIn(localite);
     await expect(profileMenu.dashboardLink).toBeVisible({ timeout: 60_000 });
   });
 

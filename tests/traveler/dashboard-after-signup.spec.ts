@@ -1,27 +1,18 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../../pages/auth/login-page';
-import { ProfileMenu } from '../../pages/components/profile-menu';
-import { DashboardPage, type DashboardSection } from '../../pages/traveler/dashboard-page';
-import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
-import { getTravelerAccount } from '../../utils/traveler/created-traveler';
+import { expect, test } from '@fixtures/test';
+import { step } from '@helpers/step';
+import type { DashboardSection } from '@pages/traveler/dashboard-page';
 
-test('DSH-001 | New traveler dashboard shows no trips, bookings, transactions, notifications, or messages', async ({ page }) => {
+test('DSH-001 | New traveler dashboard shows no trips, bookings, transactions, notifications, or messages', { tag: ['@traveler'] }, async ({
+  session, traveler, profileMenu, dashboardPage,
+}) => {
   test.setTimeout(120_000);
 
-  // Pre-setup: Traveler created by AUTH-003 (new, so every section should be empty).
-  const traveler = await getTravelerAccount();
+  // Pre-setup: the traveler created by AUTH-003 is new, so every section should be empty.
   test.info().annotations.push({ type: 'Traveler email', description: traveler.email });
-
-  const loginPage = new LoginPage(page);
-  const profileMenu = new ProfileMenu(page);
-  const dashboardPage = new DashboardPage(page);
-
-  await autoCloseNewsletterPopup(page);
 
   // Step 1: Sign in as the traveler.
   await step('Sign in as traveler', async () => {
-    await loginPage.open();
-    await loginPage.login(traveler.email, traveler.password);
+    await session.signIn(traveler);
     await expect(profileMenu.dashboardLink).toBeVisible({ timeout: 60_000 });
   });
 

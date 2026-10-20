@@ -1,5 +1,5 @@
 import { expect, type Locator } from '@playwright/test';
-import type { CreatedBooking } from '../../utils/traveler/created-traveler';
+import type { CreatedBooking } from '@data/state/created-traveler';
 import { MyBookingsPage } from '../traveler/my-bookings-page';
 
 /**

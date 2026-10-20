@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { escapeRegExp } from '../../utils/common/common';
+import { escapeRegExp } from '@helpers/text';
 
 /**
  * "Experiences I host" multi-select used on Create Your Profile and Edit Profile.

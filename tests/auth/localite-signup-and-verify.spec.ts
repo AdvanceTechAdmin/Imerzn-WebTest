@@ -1,35 +1,24 @@
-import { expect, test } from '@playwright/test';
-import { AdminLoginPage } from '../../pages/admin/admin-login-page';
-import { AdminUserDetailPage } from '../../pages/admin/admin-user-detail-page';
-import { AdminUsersPage } from '../../pages/admin/admin-users-page';
-import { SignupPage } from '../../pages/auth/signup-page';
-import { CreateGuideProfilePage } from '../../pages/localite/create-guide-profile-page';
-import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
-import { createLocaliteSignupData, readAuthData } from '../../utils/common/auth-data';
-import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
-import { saveCreatedLocalite } from '../../utils/localite/created-localite';
+import { env } from '@config/env';
+import { createLocaliteSignupData, readAuthData } from '@data/common/auth-data';
+import { saveCreatedLocalite } from '@data/state/created-localite';
+import { expect, test } from '@fixtures/test';
+import { step } from '@helpers/step';
 
-test('LOC-001 | New localite signs up and is verified by an admin', async ({ page }) => {
+/*
+ * Setup test (runs first, see playwright.config.ts): creates the localite that the localite tests, the booking flow, and the traveler
+ * search use (saved to testdata/localite/created-localite.json).
+ */
+test('LOC-001 | New localite signs up and is verified by an admin', { tag: ['@setup', '@localite', '@signup'] }, async ({
+  page, signupPage, createGuideProfilePage, guideProfilePage, adminLoginPage, adminUsersPage, adminUserDetailPage,
+}) => {
   // Run only when explicitly enabled because signup creates a real account.
-  test.skip(
-    process.env.RUN_SIGNUP_TEST !== 'true',
-    'Set RUN_SIGNUP_TEST=true to run signup.',
-  );
+  test.skip(!env.runSignup, 'Set RUN_SIGNUP_TEST=true to run signup.');
   test.setTimeout(180_000);
 
-  // Pre-setup: Prepare test data and page objects.
+  // Pre-setup: signup and profile data from auth.csv (the email gets a random suffix).
   const authData = await readAuthData();
   const { signup, profile } = createLocaliteSignupData(authData);
   test.info().annotations.push({ type: 'Localite email', description: signup.email });
-
-  const signupPage = new SignupPage(page);
-  const createProfilePage = new CreateGuideProfilePage(page);
-  const guideProfilePage = new GuideProfilePage(page);
-  const adminLoginPage = new AdminLoginPage(page);
-  const adminUsersPage = new AdminUsersPage(page);
-  const adminUserDetailPage = new AdminUserDetailPage(page);
-
-  await autoCloseNewsletterPopup(page);
 
   // Step 1: Open the home page and sign up as a Localite.
   await step('Sign up as a new Localite', async () => {
@@ -46,8 +35,8 @@ test('LOC-001 | New localite signs up and is verified by an admin', async ({ pag
 
   // Step 3: Complete the Create Your Profile form and submit it.
   await step('Create the localite profile', async () => {
-    await createProfilePage.fillForm(profile);
-    await createProfilePage.submit();
+    await createGuideProfilePage.fillForm(profile);
+    await createGuideProfilePage.submit();
 
     await expect(page).toHaveURL(/guide_detailed_page/, { timeout: 60_000 });
     await expect(guideProfilePage.dashboardLink).toBeVisible();

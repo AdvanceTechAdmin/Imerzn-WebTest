@@ -1,17 +1,13 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../../pages/auth/login-page';
-import { SettingsPage } from '../../pages/common/settings-page';
-import { ProfileMenu } from '../../pages/components/profile-menu';
-import { readAuthData } from '../../utils/common/auth-data';
-import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
-import {
-  readCreatedLocalite,
-  saveCreatedContent,
-  saveCreatedLocalite,
-} from '../../utils/localite/created-localite';
-import { readLocaliteSettingsData } from '../../utils/localite/localite-settings-data';
+import { readAuthData } from '@data/common/auth-data';
+import { readLocaliteSettingsData } from '@data/localite/localite-settings-data';
+import { readCreatedLocalite, saveCreatedContent, saveCreatedLocalite } from '@data/state/created-localite';
+import { expect, test } from '@fixtures/test';
+import { forgetSession } from '@fixtures/session';
+import { step } from '@helpers/step';
 
-test('SET-002 | Localite edits phone and Bio and changes password', async ({ page }) => {
+test('SET-002 | Localite edits phone and Bio and changes password', { tag: ['@localite'] }, async ({
+  page, session, loginPage, profileMenu, settingsPage,
+}) => {
   test.setTimeout(150_000);
 
   // Pre-setup: only the localite created by LOC-001 (never the shared Login account,
@@ -20,7 +16,7 @@ test('SET-002 | Localite edits phone and Bio and changes password', async ({ pag
   if (!localite) {
     throw new Error(
       'No created localite found (testdata/localite/created-localite.json). ' +
-      'Run the localite signup test (LOC-001) first.',
+      'Run the localite signup test (LOC-001) first: npm run test:setup',
     );
   }
   const data = await readLocaliteSettingsData();
@@ -32,16 +28,9 @@ test('SET-002 | Localite edits phone and Bio and changes password', async ({ pag
     : authData.localiteNewPassword;
   test.info().annotations.push({ type: 'Localite email', description: localite.email });
 
-  const loginPage = new LoginPage(page);
-  const profileMenu = new ProfileMenu(page);
-  const settingsPage = new SettingsPage(page);
-
-  await autoCloseNewsletterPopup(page);
-
   // Step 1: Sign in as the localite.
   await step('Sign in as localite', async () => {
-    await loginPage.open();
-    await loginPage.login(localite.email, localite.password);
+    await session.signIn(localite);
     await expect(profileMenu.dashboardLink).toBeVisible({ timeout: 60_000 });
   });
 
@@ -69,14 +58,17 @@ test('SET-002 | Localite edits phone and Bio and changes password', async ({ pag
     await settingsPage.changePassword(localite.password, newPassword);
   });
 
-  // Save the new password right away so other localite tests can still log in.
+  // Save the new password right away so other localite tests can still log in, and drop the
+  // saved session: it belongs to the old password.
   await saveCreatedLocalite({ ...localite, password: newPassword });
+  await forgetSession(localite.email);
 
-  // Step 5: Log out, then log in with the new password.
+  // Step 5: Log out.
   await step('Log out', async () => {
-    await profileMenu.logOut();
+    await session.signOut();
   });
 
+  // Step 6: Log in with the new password through the login form (this is what the test checks).
   await step('Log in with the new password', async () => {
     await loginPage.open();
     await loginPage.login(localite.email, newPassword);

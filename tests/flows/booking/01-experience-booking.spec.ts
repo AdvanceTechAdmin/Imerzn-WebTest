@@ -1,32 +1,27 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../../pages/auth/login-page';
-import { ProfileMenu } from '../../pages/components/profile-menu';
-import { toCents } from '../../pages/components/price-breakdown';
-import { FindTouristGuidePage } from '../../pages/localite/find-tourist-guide-page';
-import { BookExperienceDialog } from '../../pages/traveler/book-experience-dialog';
-import { ExperienceDetailsPage } from '../../pages/traveler/experience-details-page';
-import { PaymentDialog } from '../../pages/traveler/payment-dialog';
-import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
-import { getLocaliteAccount, readCreatedContent } from '../../utils/localite/created-localite';
-import { readExperienceData } from '../../utils/localite/experience-data';
-import { readBookingData, toSiteDate } from '../../utils/traveler/booking-data';
-import {
-  getTravelerAccount,
-  saveCreatedBooking,
-  type CreatedBooking,
-} from '../../utils/traveler/created-traveler';
+import { readExperienceData } from '@data/localite/experience-data';
+import { readCreatedContent } from '@data/state/created-localite';
+import { saveCreatedBooking, type CreatedBooking } from '@data/state/created-traveler';
+import { readBookingData, toSiteDate } from '@data/traveler/booking-data';
+import { expect, test } from '@fixtures/test';
+import { step } from '@helpers/step';
+import { toCents } from '@pages/components/price-breakdown';
 
-test('BKG-001 | Traveler books the created experience: 2 paid (one with a promo code) and 2 pending', async ({ page }) => {
+/*
+ * Booking flow step 1 of 5: the traveler books the experience created by tests/localite/create-experience.spec.ts.
+ * The bookings are saved to testdata/traveler/created-bookings.json for steps 2-5.
+ */
+test('BKG-001 | Traveler books the created experience: 2 paid (one with a promo code) and 2 pending', { tag: ['@booking', '@traveler', '@payment'] }, async ({
+  session, traveler, localite, profileMenu, experiencesPage, bookingDialog, paymentDialog,
+  experienceDetailsPage: detailsPage,
+}) => {
   test.setTimeout(420_000);
 
-  // Pre-setup: traveler from AUTH-003, latest experience, and booking data from booking.csv.
-  const traveler = await getTravelerAccount();
-  const localite = await getLocaliteAccount();
+  // Pre-setup: the latest experience, and booking data from booking.csv.
   const { experienceTitle } = await readCreatedContent(localite.email);
   if (!experienceTitle) {
     throw new Error(
       `No created experience recorded for ${localite.email}. ` +
-      'Run Create Experience first (testdata/localite/created-content.json).',
+      'Run the setup tests first (npm run test:setup).',
     );
   }
   const booking = await readBookingData();
@@ -38,19 +33,9 @@ test('BKG-001 | Traveler books the created experience: 2 paid (one with a promo 
     { type: 'Booking date', description: booking.date.toDateString() },
   );
 
-  const loginPage = new LoginPage(page);
-  const profileMenu = new ProfileMenu(page);
-  const experiencesPage = new FindTouristGuidePage(page);
-  const detailsPage = new ExperienceDetailsPage(page);
-  const bookingDialog = new BookExperienceDialog(page);
-  const paymentDialog = new PaymentDialog(page);
-
-  await autoCloseNewsletterPopup(page);
-
   // Step 1: Sign in as the traveler.
   await step('Sign in as traveler', async () => {
-    await loginPage.open();
-    await loginPage.login(traveler.email, traveler.password);
+    await session.signIn(traveler);
     await expect(profileMenu.profileImage).toBeVisible({ timeout: 60_000 });
   });
 

@@ -1,26 +1,20 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../../pages/auth/login-page';
-import { ProfileMenu } from '../../pages/components/profile-menu';
-import { LocaliteBookingsPage } from '../../pages/localite/localite-bookings-page';
-import { DashboardPage } from '../../pages/traveler/dashboard-page';
-import { MyBookingsPage } from '../../pages/traveler/my-bookings-page';
-import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
-import { getLocaliteAccount } from '../../utils/localite/created-localite';
-import { readBookingData } from '../../utils/traveler/booking-data';
-import { getTravelerAccount, readCreatedBookings } from '../../utils/traveler/created-traveler';
+import { readCreatedBookings } from '@data/state/created-traveler';
+import { readBookingData } from '@data/traveler/booking-data';
+import { expect, test } from '@fixtures/test';
+import { step } from '@helpers/step';
 
 /*
- * Cancels bookings made by tests/traveler/experience-booking.spec.ts. It is the last step of the
- * booking flow in playwright.config.ts (after both dashboards and the traveler's cancel test).
+ * Booking flow step 5 of 5: cancels bookings made in step 1
+ * (tests/flows/booking/01-experience-booking.spec.ts), after the traveler's cancel test (step 4).
  * It cancels the first paid (Ongoing) booking and the first pending booking;
- * tests/traveler/cancel-booking.spec.ts cancels the last ones.
+ * step 4 cancels the last ones.
  */
-test('LCN-001 | Localite cancels an Ongoing and a Pending booking; the traveler sees them Cancelled', async ({ page }) => {
+test('LCN-001 | Localite cancels an Ongoing and a Pending booking; the traveler sees them Cancelled', { tag: ['@booking', '@localite'] }, async ({
+  page, session, localite, traveler, profileMenu, dashboardPage, localiteBookingsPage, myBookingsPage,
+}) => {
   test.setTimeout(180_000);
 
-  // Pre-setup: localite and traveler accounts, the saved bookings, and the cancel reason.
-  const localite = await getLocaliteAccount();
-  const traveler = await getTravelerAccount();
+  // Pre-setup: the saved bookings and the cancel reason.
   const { paid, pending } = await readCreatedBookings(traveler.email);
   const { localiteCancelReason } = await readBookingData();
   const ongoingBooking = paid[0];
@@ -31,20 +25,12 @@ test('LCN-001 | Localite cancels an Ongoing and a Pending booking; the traveler 
     { type: 'Cancelled Pending booking', description: pendingBooking.date },
   );
 
-  const loginPage = new LoginPage(page);
-  const profileMenu = new ProfileMenu(page);
-  const dashboardPage = new DashboardPage(page);
-  const localiteBookingsPage = new LocaliteBookingsPage(page);
-  const myBookingsPage = new MyBookingsPage(page);
   // The site spells it "Cancelled" in tables and "Canceled" in the status filter; accept either.
   const cancelled = /^Cancell?ed$/;
 
-  await autoCloseNewsletterPopup(page);
-
   // Step 1: Sign in as the localite and open My Bookings.
   await step('Sign in as localite and open My Bookings', async () => {
-    await loginPage.open();
-    await loginPage.login(localite.email, localite.password);
+    await session.signIn(localite);
     await expect(profileMenu.dashboardLink).toBeVisible({ timeout: 60_000 });
     await profileMenu.dashboardLink.click();
     await dashboardPage.sectionLink('My Bookings').click();
@@ -89,9 +75,8 @@ test('LCN-001 | Localite cancels an Ongoing and a Pending booking; the traveler 
 
   // Step 6: Log out and sign in as the traveler.
   await step('Sign in as traveler', async () => {
-    await profileMenu.logOut();
-    await loginPage.open();
-    await loginPage.login(traveler.email, traveler.password);
+    await session.signOut();
+    await session.signIn(traveler);
     await expect(profileMenu.dashboardLink).toBeVisible({ timeout: 60_000 });
   });
 

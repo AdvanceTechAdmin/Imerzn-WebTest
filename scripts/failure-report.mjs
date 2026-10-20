@@ -68,7 +68,10 @@ for (const spec of allSpecs(results.suites)) {
       copyFileSync(attachment.path, join(outDir, 'img', name));
       images.push(name);
     }
-    failures.push({ title: spec.title, file: spec.file, project: test.projectName, error, images });
+    // "Site offline" note added by fixtures/test.ts when the site showed its maintenance page.
+    const offline = [...(result.annotations ?? []), ...(test.annotations ?? [])]
+      .find((annotation) => annotation.type === 'Site offline');
+    failures.push({ title: spec.title, file: spec.file, project: test.projectName, error, images, offline: offline?.description });
   }
 }
 
@@ -79,6 +82,7 @@ const body = failures.length
   <section>
     <h2>${escapeHtml(f.title)}</h2>
     <p class="meta">${escapeHtml(f.file)} · ${escapeHtml(f.project ?? '')}</p>
+    ${f.offline ? `<p class="offline">Site offline: ${escapeHtml(f.offline)}</p>` : ''}
     <pre>${escapeHtml(f.error || 'No error message.')}</pre>
     ${f.images.map((img) => `<a href="img/${img}"><img src="img/${img}" alt="Screenshot of ${escapeHtml(f.title)}"></a>`).join('\n    ') || '<p class="meta">No screenshot.</p>'}
   </section>`).join('\n')
@@ -97,6 +101,7 @@ writeFileSync(join(outDir, 'index.html'), `<!doctype html>
   .meta { color: #59636e; font-size: 13px; margin-top: 0; }
   section { border-top: 1px solid #d1d9e0; padding-top: 12px; margin-top: 20px; }
   pre { background: #f6f8fa; padding: 12px; overflow-x: auto; white-space: pre-wrap; font-size: 13px; }
+  .offline { background: #fff8c5; border: 1px solid #d4a72c; padding: 8px 12px; }
   img { max-width: 100%; border: 1px solid #d1d9e0; margin-top: 8px; }
 </style>
 </head>

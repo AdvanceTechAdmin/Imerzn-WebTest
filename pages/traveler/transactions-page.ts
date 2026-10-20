@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import type { CreatedBooking } from '../../utils/traveler/created-traveler';
+import type { CreatedBooking } from '@data/state/created-traveler';
 import { toMoney } from './my-bookings-page';
 
 /** Page Object for the traveler's Transactions page (/dashboard/transactions). */

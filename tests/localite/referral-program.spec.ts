@@ -1,19 +1,11 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../../pages/auth/login-page';
-import { toCents } from '../../pages/components/price-breakdown';
-import { ProfileMenu } from '../../pages/components/profile-menu';
-import { FindTouristGuidePage } from '../../pages/localite/find-tourist-guide-page';
-import { LocaliteBookingsPage } from '../../pages/localite/localite-bookings-page';
-import { LocaliteTransactionsPage, type TransactionView } from '../../pages/localite/localite-transactions-page';
-import { ReferralPage, toAmount, type ReferralHistoryRow } from '../../pages/localite/referral-page';
-import { toMoney } from '../../pages/traveler/my-bookings-page';
-import { BookExperienceDialog } from '../../pages/traveler/book-experience-dialog';
-import { DashboardPage } from '../../pages/traveler/dashboard-page';
-import { ExperienceDetailsPage } from '../../pages/traveler/experience-details-page';
-import { PaymentDialog } from '../../pages/traveler/payment-dialog';
-import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
-import { readReferralProgramData } from '../../utils/localite/referral-program-data';
-import { readBookingData, toSiteDate } from '../../utils/traveler/booking-data';
+import { readReferralProgramData } from '@data/localite/referral-program-data';
+import { readBookingData, toSiteDate } from '@data/traveler/booking-data';
+import { expect, test } from '@fixtures/test';
+import { step } from '@helpers/step';
+import { toCents } from '@pages/components/price-breakdown';
+import type { TransactionView } from '@pages/localite/localite-transactions-page';
+import { toAmount, type ReferralHistoryRow } from '@pages/localite/referral-page';
+import { toMoney } from '@pages/traveler/my-bookings-page';
 
 /*
  * Uses the fixed referral-program accounts in testdata/localite/Referral-program.csv:
@@ -21,28 +13,26 @@ import { readBookingData, toSiteDate } from '../../utils/traveler/booking-data';
  * The referee completes an Ongoing, paid booking, the referrer withdraws the referral earnings,
  * and at the end the traveler books and pays again, which the next run completes.
  * Runs in CI too (dev environment): it changes that data and makes a real (test) payment.
+ * It logs in through the login form (not session.signIn) because it switches between three
+ * fixed accounts that share one password.
  */
-test('REF-001 | Referral program: referrer earns Referral % of the commission and withdraws it', async ({ page }) => {
+test('REF-001 | Referral program: referrer earns Referral % of the commission and withdraws it', { tag: ['@localite', '@payment'] }, async ({
+  page, loginPage, profileMenu, dashboardPage, referralPage, bookingDialog, paymentDialog,
+  experiencesPage: findTouristGuidePage,
+  localiteTransactionsPage: transactionsPage,
+  localiteBookingsPage: bookingsPage,
+  experienceDetailsPage: detailsPage,
+}) => {
   test.setTimeout(300_000);
 
+  // Pre-setup: the referral accounts, and the card and billing address used by the booking tests.
   const referral = await readReferralProgramData();
-  // Card and billing address used by the other booking tests.
   const { card, billing } = await readBookingData();
   const referee = referral.referees[0];
   const refereeName = `${referee.firstName} ${referee.lastName}`;
   const travelerName = `${referral.traveler.firstName} ${referral.traveler.lastName}`;
 
-  const loginPage = new LoginPage(page);
-  const profileMenu = new ProfileMenu(page);
-  const dashboardPage = new DashboardPage(page);
-  const findTouristGuidePage = new FindTouristGuidePage(page);
-  const referralPage = new ReferralPage(page);
-  const transactionsPage = new LocaliteTransactionsPage(page);
-  const bookingsPage = new LocaliteBookingsPage(page);
-  const detailsPage = new ExperienceDetailsPage(page);
-  const bookingDialog = new BookExperienceDialog(page);
-  const paymentDialog = new PaymentDialog(page);
-
+  // Log in as one of the referral accounts through the login form.
   const logIn = async (email: string): Promise<void> => {
     await loginPage.open();
     await loginPage.login(email, referral.password);
@@ -59,13 +49,12 @@ test('REF-001 | Referral program: referrer earns Referral % of the commission an
     await profileMenu.openReferral();
     await referralPage.expectLoaded(referral.referralCode);
   };
+  // Print a Referral History row and add it to the report.
   const report = (label: string, row: ReferralHistoryRow): void => {
     const values = `Referral % ${row.referralPercent}, Total Earned ${row.totalEarned}, Withdrawable ${row.withdrawable}, Status ${row.status}`;
     console.log(`${label}: ${values}`);
     test.info().annotations.push({ type: label, description: values });
   };
-
-  await autoCloseNewsletterPopup(page);
 
   // Step 1: Referrer opens Referral from the profile menu and records the Referral History row.
   let before: ReferralHistoryRow | undefined;

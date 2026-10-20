@@ -55,10 +55,9 @@ jobs:
           RUN_SIGNUP_TEST: 'true'
           # The JSON reporter writes results.json, used by the Slack summary below.
           PLAYWRIGHT_JSON_OUTPUT_NAME: results.json
-        # One test at a time, in file order: later tests reuse accounts and content
-        # created by earlier ones (testdata/*/created-*.json), so they must not run in parallel.
-        # The booking flow (booking -> dashboards -> traveler cancel -> localite cancel) runs last,
-        # in the order of bookingFlow in playwright.config.ts; it relies on --workers=1.
+        # One test at a time (workers: 1 in playwright.config.ts): later tests reuse accounts and
+        # content created by earlier ones (testdata/*/created-*.json). Projects run in order:
+        # setup (signups, experience, gallery) -> chromium (all other tests) -> booking-flow.
         run: npx playwright test --workers=1 --reporter=list,html,json
 
       - name: Upload Playwright report

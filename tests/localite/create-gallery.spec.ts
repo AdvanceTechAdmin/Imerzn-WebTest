@@ -1,42 +1,36 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../../pages/auth/login-page';
-import { CreateGalleryPage } from '../../pages/localite/create-gallery-page';
-import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
-import { autoCloseNewsletterPopup, step } from '../../utils/common/common';
-import { getLocaliteAccount, saveCreatedContent } from '../../utils/localite/created-localite';
-import { readGalleryData } from '../../utils/localite/gallery-data';
+import { readGalleryData } from '@data/localite/gallery-data';
+import { saveCreatedContent } from '@data/state/created-localite';
+import { expect, test } from '@fixtures/test';
+import { step } from '@helpers/step';
 
-test('GAL-001 | Localite creates a gallery and it appears on the profile', async ({ page }) => {
+/*
+ * Setup test (runs after Create Experience): the localite creates a gallery. Its title is saved to
+ * testdata/localite/created-content.json for Preview Profile.
+ */
+test('GAL-001 | Localite creates a gallery and it appears on the profile', { tag: ['@setup', '@localite'] }, async ({
+  page, session, localite, guideProfilePage, createGalleryPage,
+}) => {
   test.setTimeout(90_000);
 
-  // Pre-setup: Prepare test data and page objects.
+  // Pre-setup: gallery data from create-gallery.csv (unique title per run).
   const data = await readGalleryData();
-  const localite = await getLocaliteAccount();
   test.info().annotations.push(
     { type: 'Localite email', description: localite.email },
     { type: 'Gallery title', description: data.title },
   );
 
-  const loginPage = new LoginPage(page);
-  const profilePage = new GuideProfilePage(page);
-  const createGalleryPage = new CreateGalleryPage(page);
-
-  await autoCloseNewsletterPopup(page);
-
-  // Step 1: Sign in as the localite.
+  // Step 1: Sign in as the localite (lands on the localite's profile page).
   await step('Sign in as localite', async () => {
-    await loginPage.open();
-    await loginPage.login(localite.email, localite.password);
-
+    await session.signIn(localite);
     await expect(page).toHaveURL(/guide_detailed_page/, { timeout: 60_000 });
-    await expect(profilePage.dashboardLink).toBeVisible();
+    await expect(guideProfilePage.dashboardLink).toBeVisible();
   });
 
   const profileUrl = page.url();
 
   // Step 2: Open Create Gallery and fill in the form.
   await step('Fill in the Create Gallery form', async () => {
-    await profilePage.createGalleryLink.click();
+    await guideProfilePage.createGalleryLink.click();
     await createGalleryPage.fillForm(data);
   });
 
@@ -47,7 +41,7 @@ test('GAL-001 | Localite creates a gallery and it appears on the profile', async
 
   // Step 4: Verify the gallery appears on the localite profile.
   await step('Verify the gallery on the localite profile', async () => {
-    await profilePage.verifyGalleryDisplayed(profileUrl, data.title);
+    await guideProfilePage.verifyGalleryDisplayed(profileUrl, data.title);
   });
 
   // Record the title so Preview Profile can verify it.

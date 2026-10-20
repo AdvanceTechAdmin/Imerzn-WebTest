@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import type { CreatedBooking } from '../../utils/traveler/created-traveler';
+import type { CreatedBooking } from '@data/state/created-traveler';
 
 /** Format an amount the way the site shows it, e.g. "$45.00". */
 export function toMoney(amount: number): string {

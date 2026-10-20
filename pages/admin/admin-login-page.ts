@@ -1,7 +1,8 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { env } from '@config/env';
 
-/** Admin portal URL; override with ADMIN_BASE_URL for other environments. */
-export const adminBaseUrl = process.env.ADMIN_BASE_URL ?? 'https://dev.admin.imerzn.com';
+/** Admin portal URL; set ADMIN_BASE_URL in .env for other environments. */
+export const adminBaseUrl = env.adminBaseURL;
 
 /** Page Object for the Imerzn Admin sign-in page. */
 export class AdminLoginPage {

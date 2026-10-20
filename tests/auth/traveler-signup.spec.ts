@@ -1,66 +1,55 @@
-import { expect, test } from '@playwright/test';
 import { resolve } from 'node:path';
-import { SignupPage } from '../../pages/auth/signup-page';
-import { GuideProfilePage } from '../../pages/localite/guide-profile-page';
-import { createSignupFormData, readAuthData } from '../../utils/common/auth-data';
-import { autoCloseNewsletterPopup, closeNewsletterPopupIfVisible } from '../../utils/common/common';
-import { saveCreatedTraveler } from '../../utils/traveler/created-traveler';
+import { env } from '@config/env';
+import { createSignupFormData, readAuthData } from '@data/common/auth-data';
+import { saveCreatedTraveler } from '@data/state/created-traveler';
+import { expect, test } from '@fixtures/test';
+import { step } from '@helpers/step';
 
-test('AUTH-003 | Traveler can complete the signup process', async ({ page }) => {
+/*
+ * Setup test (runs after localite signup): creates the traveler that the traveler tests and the booking flow use
+ * (saved to testdata/traveler/created-traveler.json).
+ */
+test('AUTH-003 | Traveler can complete the signup process', { tag: ['@setup', '@traveler', '@signup'] }, async ({
+  signupPage, guideProfilePage,
+}) => {
   // Run only when explicitly enabled because signup may trigger real SMS verification.
-  test.skip(
-    process.env.RUN_SIGNUP_TEST !== 'true',
-    'Set RUN_SIGNUP_TEST=true to run signup.',
-  );
+  test.skip(!env.runSignup, 'Set RUN_SIGNUP_TEST=true to run signup.');
 
-  // Prepare signup test data from the CSV file.
+  // Pre-setup: signup data from auth.csv (the email gets a random suffix).
   const authData = await readAuthData();
   const signupData = createSignupFormData(authData);
-  const signupPage = new SignupPage(page);
+  test.info().annotations.push({ type: 'Traveler email', description: signupData.email });
 
-  await autoCloseNewsletterPopup(page);
+  // Step 1: Open the signup page, select Traveler, and fill in the form.
+  await step('Fill in the traveler signup form', async () => {
+    await signupPage.openTravelerSignup();
+    await signupPage.fillForm(signupData);
+  });
 
-  // Step 1: Open the signup page and select Traveler.
-  const availability = await signupPage.openTravelerSignup();
+  // Step 2: Submit the signup form.
+  await step('Submit the signup form', async () => {
+    await signupPage.submit();
+  });
 
-  // Step 2: Enter all required signup information.
-  await signupPage.fillForm(signupData);
-
-
-  // Step 3: Submit the signup form.
-  await signupPage.submit();
-
-  // Step 4: Enter the test OTP from auth.csv.
-  await test.step('Verify OTP number', async () => {
+  // Step 3: Enter the test OTP from auth.csv.
+  await step('Verify OTP number', async () => {
     await signupPage.verifyOTPNumber(authData.signupOtp);
   });
 
-
-  // Step 5: Upload and save the cropped profile picture.
-  await test.step('Upload and save profile picture', async () => {
-    const profilePicturePath = resolve(
-      process.cwd(),
-      'testdata/traveler/profile-picture.jpg',
-    );
-    await signupPage.uploadProfilePicture(profilePicturePath);
-    // Save the image in the Crop Profile Picture dialog.
+  // Step 4: Upload the profile picture and save it in the Crop Profile Picture dialog.
+  await step('Upload and save profile picture', async () => {
+    await signupPage.uploadProfilePicture(resolve(process.cwd(), 'testdata/traveler/profile-picture.jpg'));
     await signupPage.saveCroppedProfilePicture();
   });
 
-  // Step 6: Submit the profile.
-  await test.step('Submit profile', async () => {
+  // Step 5: Submit the profile.
+  await step('Submit profile', async () => {
     await signupPage.submitProfile();
-        await closeNewsletterPopupIfVisible(page);
-
   });
 
-  // Step 7: Verify that the Dashboard  is visible.
-  await test.step('Verify Dashboard page', async () => {
-    const guideProfilePage = new GuideProfilePage(page);
-
-    await expect(guideProfilePage.dashboardLink).toBeVisible({
-      timeout: 30_000,
-    });
+  // Step 6: Verify that the Dashboard link is visible (the traveler is signed in).
+  await step('Verify Dashboard page', async () => {
+    await expect(guideProfilePage.dashboardLink).toBeVisible({ timeout: 30_000 });
   });
 
   // Save the account so traveler tests (e.g. Wishlist) can log in with it.
