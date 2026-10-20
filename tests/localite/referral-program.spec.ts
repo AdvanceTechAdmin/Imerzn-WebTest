@@ -20,10 +20,9 @@ import { readBookingData, toSiteDate } from '../../utils/traveler/booking-data';
  * the referrer, the referee who signed up with the referrer's code, and the traveler.
  * The referee completes an Ongoing, paid booking, the referrer withdraws the referral earnings,
  * and at the end the traveler books and pays again, which the next run completes.
- * Not run in CI: it changes that data and makes a real (test) payment.
+ * Runs in CI too (dev environment): it changes that data and makes a real (test) payment.
  */
 test('REF-001 | Referral program: referrer earns Referral % of the commission and withdraws it', async ({ page }) => {
-  test.skip(Boolean(process.env.CI), 'Runs locally only: completes a booking and withdraws referral earnings.');
   test.setTimeout(300_000);
 
   const referral = await readReferralProgramData();
