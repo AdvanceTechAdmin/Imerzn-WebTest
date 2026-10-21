@@ -3,14 +3,11 @@
 // make public: its steps list typed values (e.g. Fill "<password>") and traces record login requests.
 // Passwords and OTPs from testdata are masked in every error message.
 //
-// With a third argument, also writes the failures (title, file, error, screenshot paths) as JSON for
-// scripts/slack-report.mjs. Keep that file outside the output folder: the folder is published.
-//
-// Usage: node scripts/failure-report.mjs <results.json> <output folder> [<failures.json>]
+// Usage: node scripts/failure-report.mjs <results.json> <output folder>
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const [resultsPath = 'results.json', outDir = 'public-report', failuresPath] = process.argv.slice(2);
+const [resultsPath = 'results.json', outDir = 'public-report'] = process.argv.slice(2);
 const results = JSON.parse(readFileSync(resultsPath, 'utf8'));
 
 /** Values that must never appear on the page. */
@@ -116,12 +113,4 @@ ${body}
 </body>
 </html>
 `);
-if (failuresPath) {
-  writeFileSync(failuresPath, JSON.stringify(failures.map((f) => ({
-    title: f.offline ? `${f.title} (site offline)` : f.title,
-    file: f.file,
-    error: f.error,
-    images: f.images.map((img) => join(outDir, 'img', img)),
-  })), null, 2));
-}
 console.log(`Wrote ${join(outDir, 'index.html')}: ${failures.length} failed test(s), ${secrets.length} secret value(s) masked.`);
