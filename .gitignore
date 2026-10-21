@@ -47,3 +47,7 @@ results.json
 
 # Saved logins reused by fixtures/session.ts (they hold login tokens)
 .auth/
+
+# CI Slack report: failures list and temp images
+slack-failures.json
+slack-report-tmp/
