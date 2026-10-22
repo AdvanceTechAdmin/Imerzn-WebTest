@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  # Every day at 05:00 GMT+7 (Vietnam), which is 22:00 UTC the day before. GitHub schedules use
+  # UTC, run on the default branch (main), and can start a few minutes late when GitHub is busy.
+  schedule:
+    - cron: '0 22 * * *'
 
 jobs:
   test:
